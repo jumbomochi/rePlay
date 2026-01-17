@@ -10,6 +10,9 @@ class Toys extends Table {
   TextColumn get aiLabels => text().withDefault(const Constant('[]'))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  TextColumn get condition => text().withDefault(const Constant('good'))();
+  TextColumn get location => text().nullable()();
+  TextColumn get status => text().withDefault(const Constant('active'))();
 }
 
 class Categories extends Table {
