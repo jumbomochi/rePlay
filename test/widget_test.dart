@@ -1,30 +1,59 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:replay/main.dart';
+import 'package:replay/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('RePlayApp smoke test - renders main UI elements',
+      (WidgetTester tester) async {
+    // Build our app wrapped in ProviderScope and trigger a frame.
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: RePlayApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Allow async operations to complete
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Verify the app title is displayed
+    expect(find.text('rePlay'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify the search icon is present in the app bar
+    expect(find.byIcon(Icons.search), findsOneWidget);
+
+    // Verify the FAB for adding toys is present
+    expect(find.byIcon(Icons.camera_alt), findsOneWidget);
+    expect(find.text('Add Toy'), findsOneWidget);
+  });
+
+  testWidgets('Search toggle works', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: RePlayApp(),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Initially, search field should not be visible
+    expect(find.byType(TextField), findsNothing);
+
+    // Tap the search icon
+    await tester.tap(find.byIcon(Icons.search));
+    await tester.pumpAndSettle();
+
+    // Now search field should be visible and close icon should appear
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byIcon(Icons.close), findsOneWidget);
+
+    // Tap close to dismiss search
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    // Search field should be hidden again
+    expect(find.byType(TextField), findsNothing);
+    expect(find.byIcon(Icons.search), findsOneWidget);
   });
 }
