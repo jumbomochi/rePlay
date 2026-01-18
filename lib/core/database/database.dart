@@ -14,7 +14,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -22,6 +22,13 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         await m.createAll();
         await _seedCategories();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from < 2) {
+          await m.addColumn(toys, toys.condition);
+          await m.addColumn(toys, toys.location);
+          await m.addColumn(toys, toys.status);
+        }
       },
     );
   }
@@ -70,6 +77,30 @@ class AppDatabase extends _$AppDatabase {
           t.name.lower().contains(query.toLowerCase()) |
           t.aiLabels.lower().contains(query.toLowerCase())))
       .get();
+  }
+
+  // Get all distinct locations for autocomplete
+  Future<List<String>> getAllLocations() async {
+    final result = await customSelect(
+      'SELECT DISTINCT location FROM toys WHERE location IS NOT NULL ORDER BY location',
+    ).get();
+    return result.map((row) => row.read<String>('location')).toList();
+  }
+
+  // Get toys by status
+  Future<List<Toy>> getToysByStatus(String status) {
+    return (select(toys)..where((t) => t.status.equals(status))).get();
+  }
+
+  // Count toys by status
+  Future<Map<String, int>> getStatusCounts() async {
+    final result = await customSelect(
+      'SELECT status, COUNT(*) as count FROM toys GROUP BY status',
+    ).get();
+    return {
+      for (final row in result)
+        row.read<String>('status'): row.read<int>('count')
+    };
   }
 
   // Category operations
