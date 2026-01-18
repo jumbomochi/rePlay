@@ -105,6 +105,9 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
     String? thumbnailPath,
     required String category,
     List<String> aiLabels = const [],
+    String? condition,
+    String? location,
+    String? status,
   }) async {
     try {
       final id = await _db.insertToy(ToysCompanion.insert(
@@ -114,6 +117,9 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
         thumbnailPath: Value(thumbnailPath),
         category: Value(category),
         aiLabels: Value(jsonEncode(aiLabels)),
+        condition: Value(condition ?? 'good'),
+        location: Value(location),
+        status: Value(status ?? 'active'),
       ));
 
       await _loadToys();

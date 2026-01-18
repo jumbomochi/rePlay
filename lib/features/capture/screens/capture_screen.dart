@@ -19,6 +19,7 @@ class CaptureScreen extends ConsumerStatefulWidget {
 class _CaptureScreenState extends ConsumerState<CaptureScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _locationController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   String? _imagePath;
@@ -28,10 +29,16 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
   bool _isProcessing = false;
   bool _isSaving = false;
 
+  // Lifecycle fields
+  String _condition = 'good';
+  String? _location;
+  String _status = 'active';
+
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -71,6 +78,8 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
                       _buildCategoryDropdown(categories),
                       const SizedBox(height: 16),
                       if (_aiLabels.isNotEmpty) _buildAILabelsSection(),
+                      const SizedBox(height: 16),
+                      _buildLifecycleSection(),
                       const SizedBox(height: 24),
                       _buildSaveButton(),
                     ],
@@ -214,6 +223,91 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
     );
   }
 
+  Widget _buildLifecycleSection() {
+    return Card(
+      child: ExpansionTile(
+        title: const Text('Lifecycle Settings'),
+        subtitle: Text(
+          '${AppConstants.getConditionLabel(_condition)} - ${AppConstants.getStatusLabel(_status)}',
+        ),
+        leading: const Icon(Icons.settings),
+        initiallyExpanded: false,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Condition selector
+                Text(
+                  'Condition',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SegmentedButton<String>(
+                    segments: AppConstants.conditions.map((condition) {
+                      return ButtonSegment<String>(
+                        value: condition,
+                        label: Text(AppConstants.getConditionLabel(condition)),
+                      );
+                    }).toList(),
+                    selected: {_condition},
+                    onSelectionChanged: (Set<String> selected) {
+                      setState(() {
+                        _condition = selected.first;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Location field
+                TextFormField(
+                  controller: _locationController,
+                  decoration: const InputDecoration(
+                    labelText: 'Location (optional)',
+                    prefixIcon: Icon(Icons.location_on),
+                    hintText: 'e.g., Bedroom, Toy Box',
+                  ),
+                  onChanged: (value) {
+                    _location = value.isNotEmpty ? value : null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Status selector
+                Text(
+                  'Status',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SegmentedButton<String>(
+                    segments: AppConstants.statuses.map((status) {
+                      return ButtonSegment<String>(
+                        value: status,
+                        label: Text(AppConstants.getStatusLabel(status)),
+                      );
+                    }).toList(),
+                    selected: {_status},
+                    onSelectionChanged: (Set<String> selected) {
+                      setState(() {
+                        _status = selected.first;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSaveButton() {
     return FilledButton.icon(
       onPressed: _isSaving ? null : _saveToy,
@@ -330,6 +424,9 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
             thumbnailPath: _thumbnailPath,
             category: _selectedCategory,
             aiLabels: _aiLabels,
+            condition: _condition,
+            location: _location,
+            status: _status,
           );
 
       if (mounted) {
