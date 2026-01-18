@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/category_filter_chips.dart';
+import '../widgets/status_filter_tabs.dart';
 import '../widgets/toy_grid.dart';
 import 'toy_detail_screen.dart';
 import '../../capture/screens/capture_screen.dart';
@@ -64,6 +65,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
         onRefresh: () => ref.read(inventoryProvider.notifier).refresh(),
         child: Column(
           children: [
+            const SizedBox(height: 8),
+            StatusFilterTabs(
+              selectedStatus: inventoryState.selectedStatus,
+              onStatusSelected: (status) {
+                ref.read(inventoryProvider.notifier).setStatus(status);
+              },
+            ),
             const SizedBox(height: 8),
             CategoryFilterChips(
               categories: categories,
