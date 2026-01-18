@@ -24,6 +24,21 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
   String _selectedCategory = 'Other';
   bool _hasChanges = false;
 
+  // Lifecycle fields
+  String _condition = 'good';
+  String? _location;
+  String _status = 'active';
+  final _locationController = TextEditingController();
+  bool _lifecycleExpanded = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final toyAsync = ref.watch(toyByIdProvider(widget.toyId));
@@ -51,6 +66,10 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
           _nameController.text = toy.name;
           _descriptionController.text = toy.description ?? '';
           _selectedCategory = toy.category;
+          _condition = toy.condition;
+          _location = toy.location;
+          _locationController.text = toy.location ?? '';
+          _status = toy.status;
         }
 
         final aiLabels = _parseAiLabels(toy.aiLabels);
@@ -262,6 +281,106 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
             }
           },
         ),
+        const SizedBox(height: 16),
+        _buildLifecycleSection(),
+      ],
+    );
+  }
+
+  Widget _buildLifecycleSection() {
+    return ExpansionTile(
+      initiallyExpanded: _lifecycleExpanded,
+      onExpansionChanged: (expanded) {
+        setState(() => _lifecycleExpanded = expanded);
+      },
+      title: const Text('Lifecycle'),
+      leading: const Icon(Icons.autorenew),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Condition selector
+              const Text(
+                'Condition',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<String>(
+                  segments: AppConstants.conditions.map((condition) {
+                    return ButtonSegment<String>(
+                      value: condition,
+                      label: Text(
+                        AppConstants.getConditionLabel(condition),
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      icon: Icon(AppConstants.getConditionIcon(condition), size: 16),
+                    );
+                  }).toList(),
+                  selected: {_condition},
+                  onSelectionChanged: (Set<String> selection) {
+                    setState(() {
+                      _condition = selection.first;
+                      _hasChanges = true;
+                    });
+                  },
+                  showSelectedIcon: false,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Location text field
+              TextFormField(
+                controller: _locationController,
+                decoration: const InputDecoration(
+                  labelText: 'Location',
+                  hintText: 'e.g., Playroom shelf, Garage bin 2',
+                  prefixIcon: Icon(Icons.location_on),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _location = value.isNotEmpty ? value : null;
+                    _hasChanges = true;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Status selector
+              const Text(
+                'Status',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<String>(
+                  segments: AppConstants.statuses.map((status) {
+                    return ButtonSegment<String>(
+                      value: status,
+                      label: Text(
+                        AppConstants.getStatusLabel(status),
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                      icon: Icon(AppConstants.getStatusIcon(status), size: 16),
+                    );
+                  }).toList(),
+                  selected: {_status},
+                  onSelectionChanged: (Set<String> selection) {
+                    setState(() {
+                      _status = selection.first;
+                      _hasChanges = true;
+                    });
+                  },
+                  showSelectedIcon: false,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -285,6 +404,9 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
               ? _descriptionController.text
               : null,
           category: _selectedCategory,
+          condition: _condition,
+          location: _location,
+          status: _status,
         );
 
     if (success && mounted) {

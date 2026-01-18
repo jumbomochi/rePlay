@@ -129,6 +129,9 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
     String? name,
     String? description,
     String? category,
+    String? condition,
+    String? location,
+    String? status,
   }) async {
     try {
       final existing = await _db.getToyById(id);
@@ -142,6 +145,9 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
         aiLabels: Value(existing.aiLabels),
         createdAt: Value(existing.createdAt),
         updatedAt: Value(DateTime.now()),
+        condition: Value(condition ?? existing.condition),
+        location: Value(location ?? existing.location),
+        status: Value(status ?? existing.status),
       ));
       await _loadToys();
       return true;
