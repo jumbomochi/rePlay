@@ -115,6 +115,39 @@ class $ToysTable extends Toys with TableInfo<$ToysTable, Toy> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _conditionMeta = const VerificationMeta(
+    'condition',
+  );
+  @override
+  late final GeneratedColumn<String> condition = GeneratedColumn<String>(
+    'condition',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('good'),
+  );
+  static const VerificationMeta _locationMeta = const VerificationMeta(
+    'location',
+  );
+  @override
+  late final GeneratedColumn<String> location = GeneratedColumn<String>(
+    'location',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -126,6 +159,9 @@ class $ToysTable extends Toys with TableInfo<$ToysTable, Toy> {
     aiLabels,
     createdAt,
     updatedAt,
+    condition,
+    location,
+    status,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -200,6 +236,24 @@ class $ToysTable extends Toys with TableInfo<$ToysTable, Toy> {
         updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
       );
     }
+    if (data.containsKey('condition')) {
+      context.handle(
+        _conditionMeta,
+        condition.isAcceptableOrUnknown(data['condition']!, _conditionMeta),
+      );
+    }
+    if (data.containsKey('location')) {
+      context.handle(
+        _locationMeta,
+        location.isAcceptableOrUnknown(data['location']!, _locationMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
     return context;
   }
 
@@ -245,6 +299,18 @@ class $ToysTable extends Toys with TableInfo<$ToysTable, Toy> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
       )!,
+      condition: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}condition'],
+      )!,
+      location: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}location'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
     );
   }
 
@@ -264,6 +330,9 @@ class Toy extends DataClass implements Insertable<Toy> {
   final String aiLabels;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String condition;
+  final String? location;
+  final String status;
   const Toy({
     required this.id,
     required this.name,
@@ -274,6 +343,9 @@ class Toy extends DataClass implements Insertable<Toy> {
     required this.aiLabels,
     required this.createdAt,
     required this.updatedAt,
+    required this.condition,
+    this.location,
+    required this.status,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -291,6 +363,11 @@ class Toy extends DataClass implements Insertable<Toy> {
     map['ai_labels'] = Variable<String>(aiLabels);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['condition'] = Variable<String>(condition);
+    if (!nullToAbsent || location != null) {
+      map['location'] = Variable<String>(location);
+    }
+    map['status'] = Variable<String>(status);
     return map;
   }
 
@@ -309,6 +386,11 @@ class Toy extends DataClass implements Insertable<Toy> {
       aiLabels: Value(aiLabels),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      condition: Value(condition),
+      location: location == null && nullToAbsent
+          ? const Value.absent()
+          : Value(location),
+      status: Value(status),
     );
   }
 
@@ -327,6 +409,9 @@ class Toy extends DataClass implements Insertable<Toy> {
       aiLabels: serializer.fromJson<String>(json['aiLabels']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      condition: serializer.fromJson<String>(json['condition']),
+      location: serializer.fromJson<String?>(json['location']),
+      status: serializer.fromJson<String>(json['status']),
     );
   }
   @override
@@ -342,6 +427,9 @@ class Toy extends DataClass implements Insertable<Toy> {
       'aiLabels': serializer.toJson<String>(aiLabels),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'condition': serializer.toJson<String>(condition),
+      'location': serializer.toJson<String?>(location),
+      'status': serializer.toJson<String>(status),
     };
   }
 
@@ -355,6 +443,9 @@ class Toy extends DataClass implements Insertable<Toy> {
     String? aiLabels,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? condition,
+    Value<String?> location = const Value.absent(),
+    String? status,
   }) => Toy(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -367,6 +458,9 @@ class Toy extends DataClass implements Insertable<Toy> {
     aiLabels: aiLabels ?? this.aiLabels,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    condition: condition ?? this.condition,
+    location: location.present ? location.value : this.location,
+    status: status ?? this.status,
   );
   Toy copyWithCompanion(ToysCompanion data) {
     return Toy(
@@ -383,6 +477,9 @@ class Toy extends DataClass implements Insertable<Toy> {
       aiLabels: data.aiLabels.present ? data.aiLabels.value : this.aiLabels,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      condition: data.condition.present ? data.condition.value : this.condition,
+      location: data.location.present ? data.location.value : this.location,
+      status: data.status.present ? data.status.value : this.status,
     );
   }
 
@@ -397,7 +494,10 @@ class Toy extends DataClass implements Insertable<Toy> {
           ..write('category: $category, ')
           ..write('aiLabels: $aiLabels, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('condition: $condition, ')
+          ..write('location: $location, ')
+          ..write('status: $status')
           ..write(')'))
         .toString();
   }
@@ -413,6 +513,9 @@ class Toy extends DataClass implements Insertable<Toy> {
     aiLabels,
     createdAt,
     updatedAt,
+    condition,
+    location,
+    status,
   );
   @override
   bool operator ==(Object other) =>
@@ -426,7 +529,10 @@ class Toy extends DataClass implements Insertable<Toy> {
           other.category == this.category &&
           other.aiLabels == this.aiLabels &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.condition == this.condition &&
+          other.location == this.location &&
+          other.status == this.status);
 }
 
 class ToysCompanion extends UpdateCompanion<Toy> {
@@ -439,6 +545,9 @@ class ToysCompanion extends UpdateCompanion<Toy> {
   final Value<String> aiLabels;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
+  final Value<String> condition;
+  final Value<String?> location;
+  final Value<String> status;
   const ToysCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -449,6 +558,9 @@ class ToysCompanion extends UpdateCompanion<Toy> {
     this.aiLabels = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.condition = const Value.absent(),
+    this.location = const Value.absent(),
+    this.status = const Value.absent(),
   });
   ToysCompanion.insert({
     this.id = const Value.absent(),
@@ -460,6 +572,9 @@ class ToysCompanion extends UpdateCompanion<Toy> {
     this.aiLabels = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.condition = const Value.absent(),
+    this.location = const Value.absent(),
+    this.status = const Value.absent(),
   }) : name = Value(name),
        imagePath = Value(imagePath);
   static Insertable<Toy> custom({
@@ -472,6 +587,9 @@ class ToysCompanion extends UpdateCompanion<Toy> {
     Expression<String>? aiLabels,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
+    Expression<String>? condition,
+    Expression<String>? location,
+    Expression<String>? status,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -483,6 +601,9 @@ class ToysCompanion extends UpdateCompanion<Toy> {
       if (aiLabels != null) 'ai_labels': aiLabels,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (condition != null) 'condition': condition,
+      if (location != null) 'location': location,
+      if (status != null) 'status': status,
     });
   }
 
@@ -496,6 +617,9 @@ class ToysCompanion extends UpdateCompanion<Toy> {
     Value<String>? aiLabels,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
+    Value<String>? condition,
+    Value<String?>? location,
+    Value<String>? status,
   }) {
     return ToysCompanion(
       id: id ?? this.id,
@@ -507,6 +631,9 @@ class ToysCompanion extends UpdateCompanion<Toy> {
       aiLabels: aiLabels ?? this.aiLabels,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      condition: condition ?? this.condition,
+      location: location ?? this.location,
+      status: status ?? this.status,
     );
   }
 
@@ -540,6 +667,15 @@ class ToysCompanion extends UpdateCompanion<Toy> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
+    if (condition.present) {
+      map['condition'] = Variable<String>(condition.value);
+    }
+    if (location.present) {
+      map['location'] = Variable<String>(location.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
     return map;
   }
 
@@ -554,7 +690,10 @@ class ToysCompanion extends UpdateCompanion<Toy> {
           ..write('category: $category, ')
           ..write('aiLabels: $aiLabels, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('condition: $condition, ')
+          ..write('location: $location, ')
+          ..write('status: $status')
           ..write(')'))
         .toString();
   }
@@ -884,6 +1023,9 @@ typedef $$ToysTableCreateCompanionBuilder =
       Value<String> aiLabels,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<String> condition,
+      Value<String?> location,
+      Value<String> status,
     });
 typedef $$ToysTableUpdateCompanionBuilder =
     ToysCompanion Function({
@@ -896,6 +1038,9 @@ typedef $$ToysTableUpdateCompanionBuilder =
       Value<String> aiLabels,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
+      Value<String> condition,
+      Value<String?> location,
+      Value<String> status,
     });
 
 class $$ToysTableFilterComposer extends Composer<_$AppDatabase, $ToysTable> {
@@ -948,6 +1093,21 @@ class $$ToysTableFilterComposer extends Composer<_$AppDatabase, $ToysTable> {
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get condition => $composableBuilder(
+    column: $table.condition,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1004,6 +1164,21 @@ class $$ToysTableOrderingComposer extends Composer<_$AppDatabase, $ToysTable> {
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get condition => $composableBuilder(
+    column: $table.condition,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ToysTableAnnotationComposer
@@ -1045,6 +1220,15 @@ class $$ToysTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get condition =>
+      $composableBuilder(column: $table.condition, builder: (column) => column);
+
+  GeneratedColumn<String> get location =>
+      $composableBuilder(column: $table.location, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
 }
 
 class $$ToysTableTableManager
@@ -1084,6 +1268,9 @@ class $$ToysTableTableManager
                 Value<String> aiLabels = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> condition = const Value.absent(),
+                Value<String?> location = const Value.absent(),
+                Value<String> status = const Value.absent(),
               }) => ToysCompanion(
                 id: id,
                 name: name,
@@ -1094,6 +1281,9 @@ class $$ToysTableTableManager
                 aiLabels: aiLabels,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                condition: condition,
+                location: location,
+                status: status,
               ),
           createCompanionCallback:
               ({
@@ -1106,6 +1296,9 @@ class $$ToysTableTableManager
                 Value<String> aiLabels = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
+                Value<String> condition = const Value.absent(),
+                Value<String?> location = const Value.absent(),
+                Value<String> status = const Value.absent(),
               }) => ToysCompanion.insert(
                 id: id,
                 name: name,
@@ -1116,6 +1309,9 @@ class $$ToysTableTableManager
                 aiLabels: aiLabels,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                condition: condition,
+                location: location,
+                status: status,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
