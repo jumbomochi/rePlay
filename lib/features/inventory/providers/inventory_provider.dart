@@ -21,6 +21,7 @@ class InventoryState {
   final String? error;
   final String? selectedCategory;
   final String searchQuery;
+  final String? selectedStatus;
 
   InventoryState({
     this.toys = const [],
@@ -28,6 +29,7 @@ class InventoryState {
     this.error,
     this.selectedCategory,
     this.searchQuery = '',
+    this.selectedStatus,
   });
 
   InventoryState copyWith({
@@ -36,6 +38,7 @@ class InventoryState {
     String? error,
     String? selectedCategory,
     String? searchQuery,
+    String? selectedStatus,
   }) {
     return InventoryState(
       toys: toys ?? this.toys,
@@ -43,11 +46,16 @@ class InventoryState {
       error: error,
       selectedCategory: selectedCategory ?? this.selectedCategory,
       searchQuery: searchQuery ?? this.searchQuery,
+      selectedStatus: selectedStatus ?? this.selectedStatus,
     );
   }
 
   List<Toy> get filteredToys {
     var result = toys;
+
+    if (selectedStatus != null && selectedStatus!.isNotEmpty) {
+      result = result.where((t) => t.status == selectedStatus).toList();
+    }
 
     if (selectedCategory != null && selectedCategory!.isNotEmpty) {
       result = result.where((t) => t.category == selectedCategory).toList();
@@ -57,7 +65,8 @@ class InventoryState {
       final query = searchQuery.toLowerCase();
       result = result.where((t) {
         return t.name.toLowerCase().contains(query) ||
-            t.aiLabels.toLowerCase().contains(query);
+            t.aiLabels.toLowerCase().contains(query) ||
+            (t.location?.toLowerCase().contains(query) ?? false);
       }).toList();
     }
 
@@ -166,8 +175,12 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
     state = state.copyWith(searchQuery: query);
   }
 
+  void setStatus(String? status) {
+    state = state.copyWith(selectedStatus: status);
+  }
+
   void clearFilters() {
-    state = state.copyWith(selectedCategory: null, searchQuery: '');
+    state = state.copyWith(selectedCategory: null, searchQuery: '', selectedStatus: null);
   }
 }
 
