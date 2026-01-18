@@ -41,7 +41,7 @@ void main() {
     expect(find.text('Add Toy'), findsOneWidget);
 
     // Verify category filter chips are present
-    expect(find.text('All'), findsOneWidget);
+    expect(find.text('All'), findsWidgets); // May appear in both status and category filters
     expect(find.text('Action Figures'), findsOneWidget);
   });
 
@@ -107,6 +107,32 @@ void main() {
     expect(find.text('No toys yet'), findsOneWidget);
     expect(find.text('Tap the camera button to add your first toy!'),
         findsOneWidget);
+  });
+
+  testWidgets('Status filter tabs are displayed', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          inventoryProvider.overrideWith(
+            (ref) => MockInventoryNotifier(),
+          ),
+          categoryNamesProvider.overrideWith(
+            (ref) => ['Action Figures'],
+          ),
+        ],
+        child: const MaterialApp(
+          home: InventoryScreen(),
+        ),
+      ),
+    );
+
+    await tester.pump();
+
+    // Verify status filter tabs are present
+    expect(find.text('All'), findsWidgets); // May appear in both status and category
+    expect(find.text('Active'), findsOneWidget);
+    expect(find.text('In Storage'), findsOneWidget);
+    expect(find.text('To Donate'), findsOneWidget);
   });
 }
 
