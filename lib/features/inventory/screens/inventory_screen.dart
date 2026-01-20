@@ -18,7 +18,6 @@ class InventoryScreen extends ConsumerStatefulWidget {
 
 class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   final _searchController = TextEditingController();
-  bool _isSearching = false;
 
   @override
   void dispose() {
@@ -33,38 +32,39 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search toys...',
-                  border: InputBorder.none,
-                ),
-                onChanged: (value) {
-                  ref.read(inventoryProvider.notifier).setSearchQuery(value);
-                },
-              )
-            : const Text('rePlay'),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
-            onPressed: () {
-              setState(() {
-                _isSearching = !_isSearching;
-                if (!_isSearching) {
-                  _searchController.clear();
-                  ref.read(inventoryProvider.notifier).setSearchQuery('');
-                }
-              });
-            },
-          ),
-        ],
+        title: const Text('rePlay'),
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(inventoryProvider.notifier).refresh(),
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search toys...',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            ref.read(inventoryProvider.notifier).setSearchQuery('');
+                          },
+                        )
+                      : null,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                onChanged: (value) {
+                  setState(() {});
+                  ref.read(inventoryProvider.notifier).setSearchQuery(value);
+                },
+              ),
+            ),
             const SizedBox(height: 8),
             StatusFilterTabs(
               selectedStatus: inventoryState.selectedStatus,
@@ -85,6 +85,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               child: ToyGrid(
                 toys: inventoryState.filteredToys,
                 isLoading: inventoryState.isLoading,
+                searchQuery: inventoryState.searchQuery,
                 onToyTap: (toy) => _navigateToDetail(toy.id),
               ),
             ),

@@ -33,7 +33,8 @@ void main() {
     // Verify the app title is displayed
     expect(find.text('rePlay'), findsOneWidget);
 
-    // Verify the search icon is present in the app bar
+    // Verify the search field is always visible with search icon
+    expect(find.byType(TextField), findsOneWidget);
     expect(find.byIcon(Icons.search), findsOneWidget);
 
     // Verify the FAB for adding toys is present
@@ -45,7 +46,7 @@ void main() {
     expect(find.text('Action Figures'), findsOneWidget);
   });
 
-  testWidgets('Search toggle works', (WidgetTester tester) async {
+  testWidgets('Search bar is always visible with clear button', (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -64,24 +65,26 @@ void main() {
 
     await tester.pump();
 
-    // Initially, search field should not be visible
-    expect(find.byType(TextField), findsNothing);
-
-    // Tap the search icon
-    await tester.tap(find.byIcon(Icons.search));
-    await tester.pump();
-
-    // Now search field should be visible and close icon should appear
+    // Search field should always be visible
     expect(find.byType(TextField), findsOneWidget);
-    expect(find.byIcon(Icons.close), findsOneWidget);
+    expect(find.text('Search toys...'), findsOneWidget);
 
-    // Tap close to dismiss search
-    await tester.tap(find.byIcon(Icons.close));
+    // Clear button should not be visible when search is empty
+    expect(find.byIcon(Icons.clear), findsNothing);
+
+    // Enter search text
+    await tester.enterText(find.byType(TextField), 'test');
     await tester.pump();
 
-    // Search field should be hidden again
-    expect(find.byType(TextField), findsNothing);
-    expect(find.byIcon(Icons.search), findsOneWidget);
+    // Clear button should now be visible
+    expect(find.byIcon(Icons.clear), findsOneWidget);
+
+    // Tap clear to clear search
+    await tester.tap(find.byIcon(Icons.clear));
+    await tester.pump();
+
+    // Clear button should be hidden again
+    expect(find.byIcon(Icons.clear), findsNothing);
   });
 
   testWidgets('Empty state shows correct message', (WidgetTester tester) async {
