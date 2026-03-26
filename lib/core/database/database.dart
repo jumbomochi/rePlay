@@ -109,6 +109,98 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<List<Category>> watchAllCategories() =>
       (select(categories)..orderBy([(c) => OrderingTerm.asc(c.sortOrder)])).watch();
+
+  // Seed mock data for development
+  Future<void> seedMockToys() async {
+    final existingToys = await getAllToys();
+    if (existingToys.isNotEmpty) return; // Don't seed if toys exist
+
+    final mockToys = [
+      ToysCompanion.insert(
+        name: 'Buzz Lightyear',
+        description: const Value('To infinity and beyond!'),
+        imagePath: '',
+        category: const Value('Action Figures'),
+        aiLabels: const Value('["action figure", "space", "toy"]'),
+        condition: const Value('excellent'),
+        location: const Value('Bedroom'),
+        status: const Value('active'),
+      ),
+      ToysCompanion.insert(
+        name: 'LEGO Star Wars Set',
+        description: const Value('Millennium Falcon building set'),
+        imagePath: '',
+        category: const Value('Building Blocks'),
+        aiLabels: const Value('["lego", "building", "star wars"]'),
+        condition: const Value('good'),
+        location: const Value('Playroom'),
+        status: const Value('active'),
+      ),
+      ToysCompanion.insert(
+        name: 'Teddy Bear',
+        description: const Value('Soft brown teddy bear'),
+        imagePath: '',
+        category: const Value('Stuffed Animals'),
+        aiLabels: const Value('["stuffed animal", "bear", "plush"]'),
+        condition: const Value('fair'),
+        location: const Value('Bedroom'),
+        status: const Value('active'),
+      ),
+      ToysCompanion.insert(
+        name: 'Hot Wheels Car',
+        description: const Value('Red race car'),
+        imagePath: '',
+        category: const Value('Vehicles'),
+        aiLabels: const Value('["car", "vehicle", "race"]'),
+        condition: const Value('good'),
+        location: const Value('Toy Box'),
+        status: const Value('inStorage'),
+      ),
+      ToysCompanion.insert(
+        name: 'Barbie Doll',
+        description: const Value('Fashion doll with accessories'),
+        imagePath: '',
+        category: const Value('Dolls'),
+        aiLabels: const Value('["doll", "fashion", "barbie"]'),
+        condition: const Value('excellent'),
+        location: const Value('Playroom'),
+        status: const Value('active'),
+      ),
+      ToysCompanion.insert(
+        name: 'Wooden Puzzle',
+        description: const Value('Animal shapes puzzle'),
+        imagePath: '',
+        category: const Value('Puzzles'),
+        aiLabels: const Value('["puzzle", "wood", "animals"]'),
+        condition: const Value('good'),
+        status: const Value('toDonate'),
+      ),
+      ToysCompanion.insert(
+        name: 'Soccer Ball',
+        description: const Value('Size 4 soccer ball'),
+        imagePath: '',
+        category: const Value('Outdoor'),
+        aiLabels: const Value('["ball", "soccer", "sports"]'),
+        condition: const Value('fair'),
+        location: const Value('Garage'),
+        status: const Value('active'),
+      ),
+      ToysCompanion.insert(
+        name: 'Monopoly',
+        description: const Value('Classic board game'),
+        imagePath: '',
+        category: const Value('Board Games'),
+        aiLabels: const Value('["board game", "monopoly"]'),
+        condition: const Value('good'),
+        location: const Value('Closet'),
+        status: const Value('toSell'),
+      ),
+    ];
+
+    await batch((batch) {
+      batch.insertAll(toys, mockToys);
+    });
+  }
 }
 
 LazyDatabase _openConnection() {

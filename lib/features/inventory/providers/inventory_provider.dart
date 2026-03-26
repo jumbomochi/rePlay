@@ -10,6 +10,8 @@ import '../../../core/services/services_provider.dart';
 // Database provider
 final databaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
+  // Seed mock data for development
+  db.seedMockToys();
   ref.onDispose(() => db.close());
   return db;
 });

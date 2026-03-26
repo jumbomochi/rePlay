@@ -1,14 +1,23 @@
+import 'dart:io';
+
 import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 
 class AIRecognitionService {
   ImageLabeler? _labeler;
 
+  bool get _isSupported => Platform.isIOS || Platform.isAndroid;
+
   Future<void> initialize() async {
+    if (!_isSupported) return;
     final options = ImageLabelerOptions(confidenceThreshold: 0.5);
     _labeler = ImageLabeler(options: options);
   }
 
   Future<List<String>> recognizeImage(String imagePath) async {
+    if (!_isSupported) {
+      return []; // ML Kit not supported on desktop
+    }
+
     if (_labeler == null) {
       await initialize();
     }
