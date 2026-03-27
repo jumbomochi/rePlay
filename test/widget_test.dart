@@ -189,6 +189,34 @@ void main() {
     expect(find.text('LEGO Star Wars Set'), findsOneWidget);
   });
 
+  test('Batch update status changes all selected toys', () async {
+    final db = _MockDatabase();
+    final imageStorage = _MockImageStorage();
+    final notifier = InventoryNotifier(db, imageStorage);
+
+    notifier.state = InventoryState(
+      toys: [
+        Toy(id: 1, name: 'Toy1', description: null, imagePath: '', thumbnailPath: null, category: 'Other', aiLabels: '[]', createdAt: DateTime.now(), updatedAt: DateTime.now(), condition: 'good', location: null, status: 'active'),
+        Toy(id: 2, name: 'Toy2', description: null, imagePath: '', thumbnailPath: null, category: 'Other', aiLabels: '[]', createdAt: DateTime.now(), updatedAt: DateTime.now(), condition: 'good', location: null, status: 'active'),
+        Toy(id: 3, name: 'Toy3', description: null, imagePath: '', thumbnailPath: null, category: 'Other', aiLabels: '[]', createdAt: DateTime.now(), updatedAt: DateTime.now(), condition: 'good', location: null, status: 'active'),
+      ],
+    );
+
+    notifier.enterMultiSelect(1);
+    expect(notifier.state.isMultiSelectMode, true);
+    expect(notifier.state.selectedToyIds, {1});
+
+    notifier.toggleSelection(3);
+    expect(notifier.state.selectedToyIds, {1, 3});
+
+    notifier.toggleSelection(1);
+    expect(notifier.state.selectedToyIds, {3});
+
+    notifier.clearSelection();
+    expect(notifier.state.isMultiSelectMode, false);
+    expect(notifier.state.selectedToyIds, isEmpty);
+  });
+
   testWidgets('Status filter tabs show toy counts', (WidgetTester tester) async {
     final notifier = MockInventoryNotifier();
     notifier.state = InventoryState(

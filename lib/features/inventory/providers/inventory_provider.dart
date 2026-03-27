@@ -36,6 +36,8 @@ class InventoryState {
   final String searchQuery;
   final String? selectedStatus;
   final SortOption sortBy;
+  final bool isMultiSelectMode;
+  final Set<int> selectedToyIds;
 
   InventoryState({
     this.toys = const [],
@@ -45,6 +47,8 @@ class InventoryState {
     this.searchQuery = '',
     this.selectedStatus,
     this.sortBy = SortOption.newestFirst,
+    this.isMultiSelectMode = false,
+    this.selectedToyIds = const {},
   });
 
   InventoryState copyWith({
@@ -55,6 +59,8 @@ class InventoryState {
     String? searchQuery,
     String? selectedStatus,
     SortOption? sortBy,
+    bool? isMultiSelectMode,
+    Set<int>? selectedToyIds,
   }) {
     return InventoryState(
       toys: toys ?? this.toys,
@@ -64,6 +70,8 @@ class InventoryState {
       searchQuery: searchQuery ?? this.searchQuery,
       selectedStatus: selectedStatus ?? this.selectedStatus,
       sortBy: sortBy ?? this.sortBy,
+      isMultiSelectMode: isMultiSelectMode ?? this.isMultiSelectMode,
+      selectedToyIds: selectedToyIds ?? this.selectedToyIds,
     );
   }
 
@@ -233,6 +241,49 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
       selectedStatus: null,
       sortBy: SortOption.newestFirst,
     );
+  }
+
+  void enterMultiSelect(int toyId) {
+    state = state.copyWith(
+      isMultiSelectMode: true,
+      selectedToyIds: {toyId},
+    );
+  }
+
+  void toggleSelection(int toyId) {
+    final selected = Set<int>.from(state.selectedToyIds);
+    if (selected.contains(toyId)) {
+      selected.remove(toyId);
+    } else {
+      selected.add(toyId);
+    }
+    state = state.copyWith(selectedToyIds: selected);
+  }
+
+  void selectAll() {
+    final allIds = state.filteredToys.map((t) => t.id).toSet();
+    state = state.copyWith(selectedToyIds: allIds);
+  }
+
+  void clearSelection() {
+    state = state.copyWith(
+      isMultiSelectMode: false,
+      selectedToyIds: {},
+    );
+  }
+
+  Future<void> bulkUpdateStatus(String status) async {
+    for (final id in state.selectedToyIds) {
+      await updateToy(id: id, status: status);
+    }
+    clearSelection();
+  }
+
+  Future<void> bulkUpdateLocation(String location) async {
+    for (final id in state.selectedToyIds) {
+      await updateToy(id: id, location: location);
+    }
+    clearSelection();
   }
 }
 
