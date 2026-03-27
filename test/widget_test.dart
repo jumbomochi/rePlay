@@ -137,6 +137,42 @@ void main() {
     expect(find.text('In Storage'), findsOneWidget);
     expect(find.text('To Donate'), findsOneWidget);
   });
+
+  testWidgets('Search matches toy description', (WidgetTester tester) async {
+    final notifier = MockInventoryNotifier();
+    notifier.state = InventoryState(
+      toys: [
+        Toy(
+          id: 1,
+          name: 'LEGO Star Wars Set',
+          description: 'Millennium Falcon building set',
+          imagePath: '',
+          thumbnailPath: null,
+          category: 'Building Blocks',
+          aiLabels: '["lego"]',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          condition: 'good',
+          location: 'Playroom',
+          status: 'active',
+        ),
+      ],
+      searchQuery: 'millennium',
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          inventoryProvider.overrideWith((ref) => notifier),
+          categoryNamesProvider.overrideWith((ref) => []),
+        ],
+        child: const MaterialApp(home: InventoryScreen()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('LEGO Star Wars Set'), findsOneWidget);
+  });
 }
 
 /// Mock inventory notifier that doesn't use real database

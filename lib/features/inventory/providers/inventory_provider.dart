@@ -67,6 +67,7 @@ class InventoryState {
       final query = searchQuery.toLowerCase();
       result = result.where((t) {
         return t.name.toLowerCase().contains(query) ||
+            (t.description?.toLowerCase().contains(query) ?? false) ||
             t.aiLabels.toLowerCase().contains(query) ||
             (t.location?.toLowerCase().contains(query) ?? false);
       }).toList();
