@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/category_filter_chips.dart';
@@ -29,11 +30,36 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   Widget build(BuildContext context) {
     final inventoryState = ref.watch(inventoryProvider);
     final categories = ref.watch(categoryNamesProvider);
+    final isMultiSelect = inventoryState.isMultiSelectMode;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('rePlay'),
-      ),
+      appBar: isMultiSelect
+          ? AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  ref.read(inventoryProvider.notifier).clearSelection();
+                },
+              ),
+              title: Text('${inventoryState.selectedToyIds.length} selected'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.select_all),
+                  tooltip: 'Select All',
+                  onPressed: () {
+                    ref.read(inventoryProvider.notifier).selectAll();
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  tooltip: 'Actions',
+                  onPressed: () => _showBulkActionsSheet(context),
+                ),
+              ],
+            )
+          : AppBar(
+              title: const Text('rePlay'),
+            ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(inventoryProvider.notifier).refresh(),
         child: Column(
@@ -68,19 +94,19 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             const SizedBox(height: 8),
             StatusFilterTabs(
               selectedStatus: inventoryState.selectedStatus,
+              toys: inventoryState.toys,
               onStatusSelected: (status) {
                 ref.read(inventoryProvider.notifier).setStatus(status);
               },
-              toys: inventoryState.toys,
             ),
             const SizedBox(height: 8),
             CategoryFilterChips(
               categories: categories,
               selectedCategory: inventoryState.selectedCategory,
+              toys: inventoryState.toys,
               onCategorySelected: (category) {
                 ref.read(inventoryProvider.notifier).setCategory(category);
               },
-              toys: inventoryState.toys,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -112,17 +138,121 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 toys: inventoryState.filteredToys,
                 isLoading: inventoryState.isLoading,
                 searchQuery: inventoryState.searchQuery,
-                onToyTap: (toy) => _navigateToDetail(toy.id),
+                isMultiSelectMode: isMultiSelect,
+                selectedToyIds: inventoryState.selectedToyIds,
+                onToyTap: isMultiSelect
+                    ? (toy) => ref.read(inventoryProvider.notifier).toggleSelection(toy.id)
+                    : (toy) => _navigateToDetail(toy.id),
+                onToyLongPress: isMultiSelect
+                    ? null
+                    : (toy) => ref.read(inventoryProvider.notifier).enterMultiSelect(toy.id),
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToCapture,
-        icon: const Icon(Icons.camera_alt),
-        label: const Text('Add Toy'),
-      ),
+      floatingActionButton: isMultiSelect
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _navigateToCapture,
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Add Toy'),
+            ),
+    );
+  }
+
+  void _showBulkActionsSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.swap_horiz),
+                title: const Text('Change Status'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showStatusPicker(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.location_on),
+                title: const Text('Change Location'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showLocationDialog(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showStatusPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('Change Status To', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+              ...AppConstants.statuses.map((status) {
+                return ListTile(
+                  leading: Icon(AppConstants.getStatusIcon(status)),
+                  title: Text(AppConstants.getStatusLabel(status)),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ref.read(inventoryProvider.notifier).bulkUpdateStatus(status);
+                  },
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showLocationDialog(BuildContext context) {
+    final locationController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change Location'),
+          content: TextField(
+            controller: locationController,
+            decoration: const InputDecoration(
+              hintText: 'Enter location...',
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final location = locationController.text.trim();
+                if (location.isNotEmpty) {
+                  Navigator.pop(context);
+                  ref.read(inventoryProvider.notifier).bulkUpdateLocation(location);
+                }
+              },
+              child: const Text('Apply'),
+            ),
+          ],
+        );
+      },
     );
   }
 

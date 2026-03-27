@@ -217,6 +217,35 @@ void main() {
     expect(notifier.state.selectedToyIds, isEmpty);
   });
 
+  testWidgets('Long press enters multi-select mode', (WidgetTester tester) async {
+    final notifier = MockInventoryNotifier();
+    notifier.state = InventoryState(
+      toys: [
+        Toy(id: 1, name: 'TestToy', description: null, imagePath: '', thumbnailPath: null, category: 'Other', aiLabels: '[]', createdAt: DateTime.now(), updatedAt: DateTime.now(), condition: 'good', location: null, status: 'active'),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          inventoryProvider.overrideWith((ref) => notifier),
+          categoryNamesProvider.overrideWith((ref) => ['Other']),
+        ],
+        child: const MaterialApp(home: InventoryScreen()),
+      ),
+    );
+    await tester.pump();
+
+    final toyCardFinder = find.ancestor(
+      of: find.text('TestToy'),
+      matching: find.byType(InkWell),
+    );
+    await tester.longPress(toyCardFinder);
+    await tester.pump();
+
+    expect(find.text('1 selected'), findsOneWidget);
+  });
+
   testWidgets('Status filter tabs show toy counts', (WidgetTester tester) async {
     final notifier = MockInventoryNotifier();
     notifier.state = InventoryState(
