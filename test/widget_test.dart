@@ -188,6 +188,32 @@ void main() {
 
     expect(find.text('LEGO Star Wars Set'), findsOneWidget);
   });
+
+  testWidgets('Status filter tabs show toy counts', (WidgetTester tester) async {
+    final notifier = MockInventoryNotifier();
+    notifier.state = InventoryState(
+      toys: [
+        Toy(id: 1, name: 'Toy1', description: null, imagePath: '', thumbnailPath: null, category: 'Other', aiLabels: '[]', createdAt: DateTime.now(), updatedAt: DateTime.now(), condition: 'good', location: null, status: 'active'),
+        Toy(id: 2, name: 'Toy2', description: null, imagePath: '', thumbnailPath: null, category: 'Other', aiLabels: '[]', createdAt: DateTime.now(), updatedAt: DateTime.now(), condition: 'good', location: null, status: 'active'),
+        Toy(id: 3, name: 'Toy3', description: null, imagePath: '', thumbnailPath: null, category: 'Dolls', aiLabels: '[]', createdAt: DateTime.now(), updatedAt: DateTime.now(), condition: 'good', location: null, status: 'toDonate'),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          inventoryProvider.overrideWith((ref) => notifier),
+          categoryNamesProvider.overrideWith((ref) => ['Other', 'Dolls']),
+        ],
+        child: const MaterialApp(home: InventoryScreen()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('All (3)'), findsWidgets); // Appears in both status and category filters
+    expect(find.text('Active (2)'), findsOneWidget);
+    expect(find.text('To Donate (1)'), findsOneWidget);
+  });
 }
 
 /// Mock inventory notifier that doesn't use real database

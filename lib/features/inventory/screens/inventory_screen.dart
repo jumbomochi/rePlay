@@ -71,6 +71,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               onStatusSelected: (status) {
                 ref.read(inventoryProvider.notifier).setStatus(status);
               },
+              toys: inventoryState.toys,
             ),
             const SizedBox(height: 8),
             CategoryFilterChips(
@@ -79,6 +80,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               onCategorySelected: (category) {
                 ref.read(inventoryProvider.notifier).setCategory(category);
               },
+              toys: inventoryState.toys,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
