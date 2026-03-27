@@ -80,7 +80,31 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 ref.read(inventoryProvider.notifier).setCategory(category);
               },
             ),
-            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  DropdownButton<SortOption>(
+                    value: inventoryState.sortBy,
+                    underline: const SizedBox.shrink(),
+                    icon: const Icon(Icons.sort, size: 20),
+                    style: Theme.of(context).textTheme.bodySmall,
+                    items: SortOption.values.map((option) {
+                      return DropdownMenuItem(
+                        value: option,
+                        child: Text(option.label),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        ref.read(inventoryProvider.notifier).setSortOption(value);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: ToyGrid(
                 toys: inventoryState.filteredToys,

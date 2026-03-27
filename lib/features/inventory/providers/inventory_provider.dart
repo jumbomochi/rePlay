@@ -16,6 +16,17 @@ final databaseProvider = Provider<AppDatabase>((ref) {
   return db;
 });
 
+enum SortOption {
+  newestFirst('Newest First'),
+  oldestFirst('Oldest First'),
+  nameAsc('Name A-Z'),
+  nameDesc('Name Z-A'),
+  category('Category');
+
+  const SortOption(this.label);
+  final String label;
+}
+
 // Inventory state
 class InventoryState {
   final List<Toy> toys;
@@ -24,6 +35,7 @@ class InventoryState {
   final String? selectedCategory;
   final String searchQuery;
   final String? selectedStatus;
+  final SortOption sortBy;
 
   InventoryState({
     this.toys = const [],
@@ -32,6 +44,7 @@ class InventoryState {
     this.selectedCategory,
     this.searchQuery = '',
     this.selectedStatus,
+    this.sortBy = SortOption.newestFirst,
   });
 
   InventoryState copyWith({
@@ -41,6 +54,7 @@ class InventoryState {
     String? selectedCategory,
     String? searchQuery,
     String? selectedStatus,
+    SortOption? sortBy,
   }) {
     return InventoryState(
       toys: toys ?? this.toys,
@@ -49,11 +63,12 @@ class InventoryState {
       selectedCategory: selectedCategory ?? this.selectedCategory,
       searchQuery: searchQuery ?? this.searchQuery,
       selectedStatus: selectedStatus ?? this.selectedStatus,
+      sortBy: sortBy ?? this.sortBy,
     );
   }
 
   List<Toy> get filteredToys {
-    var result = toys;
+    var result = List<Toy>.from(toys);
 
     if (selectedStatus != null && selectedStatus!.isNotEmpty) {
       result = result.where((t) => t.status == selectedStatus).toList();
@@ -71,6 +86,19 @@ class InventoryState {
             t.aiLabels.toLowerCase().contains(query) ||
             (t.location?.toLowerCase().contains(query) ?? false);
       }).toList();
+    }
+
+    switch (sortBy) {
+      case SortOption.newestFirst:
+        result.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      case SortOption.oldestFirst:
+        result.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      case SortOption.nameAsc:
+        result.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      case SortOption.nameDesc:
+        result.sort((a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+      case SortOption.category:
+        result.sort((a, b) => a.category.compareTo(b.category));
     }
 
     return result;
@@ -194,8 +222,17 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
     state = state.copyWith(selectedStatus: status);
   }
 
+  void setSortOption(SortOption option) {
+    state = state.copyWith(sortBy: option);
+  }
+
   void clearFilters() {
-    state = state.copyWith(selectedCategory: null, searchQuery: '', selectedStatus: null);
+    state = state.copyWith(
+      selectedCategory: null,
+      searchQuery: '',
+      selectedStatus: null,
+      sortBy: SortOption.newestFirst,
+    );
   }
 }
 

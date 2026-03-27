@@ -138,6 +138,21 @@ void main() {
     expect(find.text('To Donate'), findsOneWidget);
   });
 
+  testWidgets('Sort dropdown appears and defaults to Newest First', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          inventoryProvider.overrideWith((ref) => MockInventoryNotifier()),
+          categoryNamesProvider.overrideWith((ref) => []),
+        ],
+        child: const MaterialApp(home: InventoryScreen()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Newest First'), findsOneWidget);
+  });
+
   testWidgets('Search matches toy description', (WidgetTester tester) async {
     final notifier = MockInventoryNotifier();
     notifier.state = InventoryState(
