@@ -8,11 +8,17 @@ import '../../../core/database/database.dart';
 class ToyCard extends StatelessWidget {
   final Toy toy;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final bool isSelected;
+  final bool isMultiSelectMode;
 
   const ToyCard({
     super.key,
     required this.toy,
     this.onTap,
+    this.onLongPress,
+    this.isSelected = false,
+    this.isMultiSelectMode = false,
   });
 
   @override
@@ -23,6 +29,7 @@ class ToyCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Stack(
           children: [
             Column(
@@ -106,6 +113,38 @@ class ToyCard extends StatelessWidget {
                         : Colors.orange,
                     shape: BoxShape.circle,
                   ),
+                ),
+              ),
+            // Selection overlay
+            if (isMultiSelectMode)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                        : Colors.transparent,
+                    border: isSelected
+                        ? Border.all(color: theme.colorScheme.primary, width: 3)
+                        : null,
+                  ),
+                  child: isSelected
+                      ? Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            margin: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.check,
+                              size: 16,
+                              color: theme.colorScheme.onPrimary,
+                            ),
+                          ),
+                        )
+                      : null,
                 ),
               ),
           ],

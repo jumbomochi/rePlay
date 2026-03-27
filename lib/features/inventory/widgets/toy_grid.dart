@@ -6,15 +6,21 @@ import 'toy_card.dart';
 class ToyGrid extends StatelessWidget {
   final List<Toy> toys;
   final void Function(Toy toy)? onToyTap;
+  final void Function(Toy toy)? onToyLongPress;
   final bool isLoading;
   final String searchQuery;
+  final bool isMultiSelectMode;
+  final Set<int> selectedToyIds;
 
   const ToyGrid({
     super.key,
     required this.toys,
     this.onToyTap,
+    this.onToyLongPress,
     this.isLoading = false,
     this.searchQuery = '',
+    this.isMultiSelectMode = false,
+    this.selectedToyIds = const {},
   });
 
   @override
@@ -73,6 +79,9 @@ class ToyGrid extends StatelessWidget {
         return ToyCard(
           toy: toy,
           onTap: onToyTap != null ? () => onToyTap!(toy) : null,
+          onLongPress: onToyLongPress != null ? () => onToyLongPress!(toy) : null,
+          isSelected: selectedToyIds.contains(toy.id),
+          isMultiSelectMode: isMultiSelectMode,
         );
       },
     );
