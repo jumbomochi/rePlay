@@ -1,12 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/database/database.dart';
+import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
+import '../widgets/photo_gallery_strip.dart';
 
 class ToyDetailScreen extends ConsumerStatefulWidget {
   final int toyId;
@@ -18,6 +23,7 @@ class ToyDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
+  int _selectedPhotoIndex = 0;
   bool _isEditing = false;
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -73,6 +79,8 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
         }
 
         final aiLabels = _parseAiLabels(toy.aiLabels);
+        final toyImagesAsync = ref.watch(toyImagesProvider(widget.toyId));
+        final additionalImages = toyImagesAsync.valueOrNull ?? [];
 
         return Scaffold(
           appBar: AppBar(
@@ -99,7 +107,22 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildImage(toy.imagePath),
+                _buildMainImage(toy, additionalImages),
+                if (toy.imagePath.isNotEmpty || additionalImages.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: PhotoGalleryStrip(
+                      coverImagePath: toy.imagePath,
+                      coverThumbnailPath: toy.thumbnailPath,
+                      additionalImages: additionalImages,
+                      selectedIndex: _selectedPhotoIndex,
+                      onThumbnailTap: (index) {
+                        setState(() => _selectedPhotoIndex = index);
+                      },
+                      onAddPhoto: () => _addPhoto(toy.id),
+                      onDeletePhoto: (imageId) => _confirmDeletePhoto(imageId),
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: _isEditing
@@ -130,7 +153,19 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
     }
   }
 
-  Widget _buildImage(String imagePath) {
+  Widget _buildMainImage(Toy toy, List<ToyImage> additionalImages) {
+    String imagePath;
+    if (_selectedPhotoIndex == 0) {
+      imagePath = toy.imagePath;
+    } else {
+      final imgIndex = _selectedPhotoIndex - (toy.imagePath.isNotEmpty ? 1 : 0);
+      if (imgIndex >= 0 && imgIndex < additionalImages.length) {
+        imagePath = additionalImages[imgIndex].imagePath;
+      } else {
+        imagePath = toy.imagePath;
+      }
+    }
+
     return AspectRatio(
       aspectRatio: 1,
       child: FutureBuilder<bool>(
@@ -453,5 +488,109 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
     if (success && mounted) {
       Navigator.of(context).pop(true);
     }
+  }
+
+  Future<void> _addPhoto(int toyId) async {
+    final db = ref.read(databaseProvider);
+    final imageCount = await db.countImagesForToy(toyId);
+    if (imageCount >= 10) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Maximum 10 additional photos reached')),
+        );
+      }
+      return;
+    }
+
+    if (!mounted) return;
+
+    final picker = ImagePicker();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    final pickedFile = await picker.pickImage(
+      source: source,
+      maxWidth: 1920,
+      maxHeight: 1920,
+      imageQuality: 85,
+    );
+
+    if (pickedFile == null) return;
+
+    final imageStorage = ref.read(imageStorageServiceProvider);
+    final saved = await imageStorage.saveImage(File(pickedFile.path));
+
+    final currentCount = await db.countImagesForToy(toyId);
+    await db.insertToyImage(ToyImagesCompanion.insert(
+      toyId: toyId,
+      imagePath: saved.imagePath,
+      thumbnailPath: Value(saved.thumbnailPath),
+      sortOrder: Value(currentCount),
+    ));
+
+    ref.invalidate(toyImagesProvider(toyId));
+  }
+
+  void _confirmDeletePhoto(int imageId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Photo'),
+        content: const Text('Remove this photo?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _deletePhoto(imageId);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deletePhoto(int imageId) async {
+    final db = ref.read(databaseProvider);
+    final imageStorage = ref.read(imageStorageServiceProvider);
+
+    final images = await db.getImagesForToy(widget.toyId);
+    final image = images.firstWhere((i) => i.id == imageId);
+
+    await imageStorage.deleteImage(
+      image.imagePath,
+      thumbnailPath: image.thumbnailPath,
+    );
+    await db.deleteToyImage(imageId);
+
+    setState(() => _selectedPhotoIndex = 0);
+    ref.invalidate(toyImagesProvider(widget.toyId));
   }
 }
