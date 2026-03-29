@@ -32,6 +32,9 @@ dependencies:
   # AI Recognition
   google_mlkit_image_labeling: ^0.11.0
 
+  # Sharing
+  share_plus: ^10.1.4
+
   # Utilities
   uuid: ^4.2.2
 
