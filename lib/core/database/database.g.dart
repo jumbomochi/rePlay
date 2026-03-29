@@ -1000,16 +1000,423 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   }
 }
 
+class $ToyImagesTable extends ToyImages
+    with TableInfo<$ToyImagesTable, ToyImage> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ToyImagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _toyIdMeta = const VerificationMeta('toyId');
+  @override
+  late final GeneratedColumn<int> toyId = GeneratedColumn<int>(
+    'toy_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _imagePathMeta = const VerificationMeta(
+    'imagePath',
+  );
+  @override
+  late final GeneratedColumn<String> imagePath = GeneratedColumn<String>(
+    'image_path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _thumbnailPathMeta = const VerificationMeta(
+    'thumbnailPath',
+  );
+  @override
+  late final GeneratedColumn<String> thumbnailPath = GeneratedColumn<String>(
+    'thumbnail_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    toyId,
+    imagePath,
+    thumbnailPath,
+    sortOrder,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'toy_images';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ToyImage> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('toy_id')) {
+      context.handle(
+        _toyIdMeta,
+        toyId.isAcceptableOrUnknown(data['toy_id']!, _toyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_toyIdMeta);
+    }
+    if (data.containsKey('image_path')) {
+      context.handle(
+        _imagePathMeta,
+        imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_imagePathMeta);
+    }
+    if (data.containsKey('thumbnail_path')) {
+      context.handle(
+        _thumbnailPathMeta,
+        thumbnailPath.isAcceptableOrUnknown(
+          data['thumbnail_path']!,
+          _thumbnailPathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ToyImage map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ToyImage(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      toyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}toy_id'],
+      )!,
+      imagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_path'],
+      )!,
+      thumbnailPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}thumbnail_path'],
+      ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ToyImagesTable createAlias(String alias) {
+    return $ToyImagesTable(attachedDatabase, alias);
+  }
+}
+
+class ToyImage extends DataClass implements Insertable<ToyImage> {
+  final int id;
+  final int toyId;
+  final String imagePath;
+  final String? thumbnailPath;
+  final int sortOrder;
+  final DateTime createdAt;
+  const ToyImage({
+    required this.id,
+    required this.toyId,
+    required this.imagePath,
+    this.thumbnailPath,
+    required this.sortOrder,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['toy_id'] = Variable<int>(toyId);
+    map['image_path'] = Variable<String>(imagePath);
+    if (!nullToAbsent || thumbnailPath != null) {
+      map['thumbnail_path'] = Variable<String>(thumbnailPath);
+    }
+    map['sort_order'] = Variable<int>(sortOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ToyImagesCompanion toCompanion(bool nullToAbsent) {
+    return ToyImagesCompanion(
+      id: Value(id),
+      toyId: Value(toyId),
+      imagePath: Value(imagePath),
+      thumbnailPath: thumbnailPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnailPath),
+      sortOrder: Value(sortOrder),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ToyImage.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ToyImage(
+      id: serializer.fromJson<int>(json['id']),
+      toyId: serializer.fromJson<int>(json['toyId']),
+      imagePath: serializer.fromJson<String>(json['imagePath']),
+      thumbnailPath: serializer.fromJson<String?>(json['thumbnailPath']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'toyId': serializer.toJson<int>(toyId),
+      'imagePath': serializer.toJson<String>(imagePath),
+      'thumbnailPath': serializer.toJson<String?>(thumbnailPath),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ToyImage copyWith({
+    int? id,
+    int? toyId,
+    String? imagePath,
+    Value<String?> thumbnailPath = const Value.absent(),
+    int? sortOrder,
+    DateTime? createdAt,
+  }) => ToyImage(
+    id: id ?? this.id,
+    toyId: toyId ?? this.toyId,
+    imagePath: imagePath ?? this.imagePath,
+    thumbnailPath: thumbnailPath.present
+        ? thumbnailPath.value
+        : this.thumbnailPath,
+    sortOrder: sortOrder ?? this.sortOrder,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ToyImage copyWithCompanion(ToyImagesCompanion data) {
+    return ToyImage(
+      id: data.id.present ? data.id.value : this.id,
+      toyId: data.toyId.present ? data.toyId.value : this.toyId,
+      imagePath: data.imagePath.present ? data.imagePath.value : this.imagePath,
+      thumbnailPath: data.thumbnailPath.present
+          ? data.thumbnailPath.value
+          : this.thumbnailPath,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ToyImage(')
+          ..write('id: $id, ')
+          ..write('toyId: $toyId, ')
+          ..write('imagePath: $imagePath, ')
+          ..write('thumbnailPath: $thumbnailPath, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, toyId, imagePath, thumbnailPath, sortOrder, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ToyImage &&
+          other.id == this.id &&
+          other.toyId == this.toyId &&
+          other.imagePath == this.imagePath &&
+          other.thumbnailPath == this.thumbnailPath &&
+          other.sortOrder == this.sortOrder &&
+          other.createdAt == this.createdAt);
+}
+
+class ToyImagesCompanion extends UpdateCompanion<ToyImage> {
+  final Value<int> id;
+  final Value<int> toyId;
+  final Value<String> imagePath;
+  final Value<String?> thumbnailPath;
+  final Value<int> sortOrder;
+  final Value<DateTime> createdAt;
+  const ToyImagesCompanion({
+    this.id = const Value.absent(),
+    this.toyId = const Value.absent(),
+    this.imagePath = const Value.absent(),
+    this.thumbnailPath = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  ToyImagesCompanion.insert({
+    this.id = const Value.absent(),
+    required int toyId,
+    required String imagePath,
+    this.thumbnailPath = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : toyId = Value(toyId),
+       imagePath = Value(imagePath);
+  static Insertable<ToyImage> custom({
+    Expression<int>? id,
+    Expression<int>? toyId,
+    Expression<String>? imagePath,
+    Expression<String>? thumbnailPath,
+    Expression<int>? sortOrder,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (toyId != null) 'toy_id': toyId,
+      if (imagePath != null) 'image_path': imagePath,
+      if (thumbnailPath != null) 'thumbnail_path': thumbnailPath,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  ToyImagesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? toyId,
+    Value<String>? imagePath,
+    Value<String?>? thumbnailPath,
+    Value<int>? sortOrder,
+    Value<DateTime>? createdAt,
+  }) {
+    return ToyImagesCompanion(
+      id: id ?? this.id,
+      toyId: toyId ?? this.toyId,
+      imagePath: imagePath ?? this.imagePath,
+      thumbnailPath: thumbnailPath ?? this.thumbnailPath,
+      sortOrder: sortOrder ?? this.sortOrder,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (toyId.present) {
+      map['toy_id'] = Variable<int>(toyId.value);
+    }
+    if (imagePath.present) {
+      map['image_path'] = Variable<String>(imagePath.value);
+    }
+    if (thumbnailPath.present) {
+      map['thumbnail_path'] = Variable<String>(thumbnailPath.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ToyImagesCompanion(')
+          ..write('id: $id, ')
+          ..write('toyId: $toyId, ')
+          ..write('imagePath: $imagePath, ')
+          ..write('thumbnailPath: $thumbnailPath, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ToysTable toys = $ToysTable(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
+  late final $ToyImagesTable toyImages = $ToyImagesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [toys, categories];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    toys,
+    categories,
+    toyImages,
+  ];
 }
 
 typedef $$ToysTableCreateCompanionBuilder =
@@ -1504,6 +1911,215 @@ typedef $$CategoriesTableProcessedTableManager =
       Category,
       PrefetchHooks Function()
     >;
+typedef $$ToyImagesTableCreateCompanionBuilder =
+    ToyImagesCompanion Function({
+      Value<int> id,
+      required int toyId,
+      required String imagePath,
+      Value<String?> thumbnailPath,
+      Value<int> sortOrder,
+      Value<DateTime> createdAt,
+    });
+typedef $$ToyImagesTableUpdateCompanionBuilder =
+    ToyImagesCompanion Function({
+      Value<int> id,
+      Value<int> toyId,
+      Value<String> imagePath,
+      Value<String?> thumbnailPath,
+      Value<int> sortOrder,
+      Value<DateTime> createdAt,
+    });
+
+class $$ToyImagesTableFilterComposer
+    extends Composer<_$AppDatabase, $ToyImagesTable> {
+  $$ToyImagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get toyId => $composableBuilder(
+    column: $table.toyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get imagePath => $composableBuilder(
+    column: $table.imagePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get thumbnailPath => $composableBuilder(
+    column: $table.thumbnailPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ToyImagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ToyImagesTable> {
+  $$ToyImagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get toyId => $composableBuilder(
+    column: $table.toyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get imagePath => $composableBuilder(
+    column: $table.imagePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get thumbnailPath => $composableBuilder(
+    column: $table.thumbnailPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ToyImagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ToyImagesTable> {
+  $$ToyImagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get toyId =>
+      $composableBuilder(column: $table.toyId, builder: (column) => column);
+
+  GeneratedColumn<String> get imagePath =>
+      $composableBuilder(column: $table.imagePath, builder: (column) => column);
+
+  GeneratedColumn<String> get thumbnailPath => $composableBuilder(
+    column: $table.thumbnailPath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ToyImagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ToyImagesTable,
+          ToyImage,
+          $$ToyImagesTableFilterComposer,
+          $$ToyImagesTableOrderingComposer,
+          $$ToyImagesTableAnnotationComposer,
+          $$ToyImagesTableCreateCompanionBuilder,
+          $$ToyImagesTableUpdateCompanionBuilder,
+          (ToyImage, BaseReferences<_$AppDatabase, $ToyImagesTable, ToyImage>),
+          ToyImage,
+          PrefetchHooks Function()
+        > {
+  $$ToyImagesTableTableManager(_$AppDatabase db, $ToyImagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ToyImagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ToyImagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ToyImagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> toyId = const Value.absent(),
+                Value<String> imagePath = const Value.absent(),
+                Value<String?> thumbnailPath = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => ToyImagesCompanion(
+                id: id,
+                toyId: toyId,
+                imagePath: imagePath,
+                thumbnailPath: thumbnailPath,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int toyId,
+                required String imagePath,
+                Value<String?> thumbnailPath = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => ToyImagesCompanion.insert(
+                id: id,
+                toyId: toyId,
+                imagePath: imagePath,
+                thumbnailPath: thumbnailPath,
+                sortOrder: sortOrder,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ToyImagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ToyImagesTable,
+      ToyImage,
+      $$ToyImagesTableFilterComposer,
+      $$ToyImagesTableOrderingComposer,
+      $$ToyImagesTableAnnotationComposer,
+      $$ToyImagesTableCreateCompanionBuilder,
+      $$ToyImagesTableUpdateCompanionBuilder,
+      (ToyImage, BaseReferences<_$AppDatabase, $ToyImagesTable, ToyImage>),
+      ToyImage,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1511,4 +2127,6 @@ class $AppDatabaseManager {
   $$ToysTableTableManager get toys => $$ToysTableTableManager(_db, _db.toys);
   $$CategoriesTableTableManager get categories =>
       $$CategoriesTableTableManager(_db, _db.categories);
+  $$ToyImagesTableTableManager get toyImages =>
+      $$ToyImagesTableTableManager(_db, _db.toyImages);
 }

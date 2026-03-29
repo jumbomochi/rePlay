@@ -9,12 +9,12 @@ import 'tables/toys_table.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Toys, Categories])
+@DriftDatabase(tables: [Toys, Categories, ToyImages])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -28,6 +28,9 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(toys, toys.condition);
           await m.addColumn(toys, toys.location);
           await m.addColumn(toys, toys.status);
+        }
+        if (from < 3) {
+          await m.createTable(toyImages);
         }
       },
     );
@@ -109,6 +112,35 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<List<Category>> watchAllCategories() =>
       (select(categories)..orderBy([(c) => OrderingTerm.asc(c.sortOrder)])).watch();
+
+  // ToyImages operations
+  Future<List<ToyImage>> getImagesForToy(int toyId) {
+    return (select(toyImages)
+          ..where((t) => t.toyId.equals(toyId))
+          ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
+        .get();
+  }
+
+  Future<int> insertToyImage(ToyImagesCompanion image) {
+    return into(toyImages).insert(image);
+  }
+
+  Future<int> deleteToyImage(int id) {
+    return (delete(toyImages)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<int> deleteImagesForToy(int toyId) {
+    return (delete(toyImages)..where((t) => t.toyId.equals(toyId))).go();
+  }
+
+  Future<int> countImagesForToy(int toyId) async {
+    final count = countAll();
+    final query = selectOnly(toyImages)
+      ..addColumns([count])
+      ..where(toyImages.toyId.equals(toyId));
+    final result = await query.getSingle();
+    return result.read(count) ?? 0;
+  }
 
   // Seed mock data for development
   Future<void> seedMockToys() async {

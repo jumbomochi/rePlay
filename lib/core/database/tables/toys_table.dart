@@ -21,3 +21,12 @@ class Categories extends Table {
   TextColumn get iconName => text().nullable()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 }
+
+class ToyImages extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get toyId => integer()();
+  TextColumn get imagePath => text()();
+  TextColumn get thumbnailPath => text().nullable()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
