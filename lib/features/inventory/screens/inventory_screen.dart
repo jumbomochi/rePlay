@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/database/database.dart';
+import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/category_filter_chips.dart';
@@ -59,6 +62,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             )
           : AppBar(
               title: const Text('rePlay'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.share),
+                  tooltip: 'Export',
+                  onPressed: () => _showExportSheet(context),
+                ),
+              ],
             ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(inventoryProvider.notifier).refresh(),
@@ -158,6 +168,68 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               icon: const Icon(Icons.camera_alt),
               label: const Text('Add Toy'),
             ),
+    );
+  }
+
+  void _showExportSheet(BuildContext context) {
+    final inventoryState = ref.read(inventoryProvider);
+    final filteredToys = inventoryState.filteredToys;
+
+    if (filteredToys.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nothing to export')),
+      );
+      return;
+    }
+
+    final filterLabel = inventoryState.selectedStatus != null
+        ? AppConstants.getStatusLabel(inventoryState.selectedStatus!)
+        : 'All';
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.text_snippet),
+                title: const Text('Share as Text'),
+                subtitle: const Text('For messaging apps'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _shareAsText(filteredToys, filterLabel);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.table_chart),
+                title: const Text('Export as CSV'),
+                subtitle: const Text('For spreadsheet apps'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _shareAsCsv(filteredToys);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _shareAsText(List<Toy> toys, String filterLabel) async {
+    final exportService = ref.read(exportServiceProvider);
+    final text = exportService.generateTextList(toys, filterLabel);
+    await Share.share(text, subject: 'rePlay Toy List');
+  }
+
+  Future<void> _shareAsCsv(List<Toy> toys) async {
+    final exportService = ref.read(exportServiceProvider);
+    final filePath = await exportService.writeCsvFile(toys);
+    await Share.shareXFiles(
+      [XFile(filePath)],
+      subject: 'rePlay Toy Export',
     );
   }
 
