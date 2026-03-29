@@ -205,6 +205,16 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
   Future<bool> deleteToy(int id) async {
     try {
       final toy = await _db.getToyById(id);
+      // Delete additional images
+      final additionalImages = await _db.getImagesForToy(id);
+      for (final img in additionalImages) {
+        await _imageStorage.deleteImage(
+          img.imagePath,
+          thumbnailPath: img.thumbnailPath,
+        );
+      }
+      await _db.deleteImagesForToy(id);
+      // Delete cover image
       await _imageStorage.deleteImage(
         toy.imagePath,
         thumbnailPath: toy.thumbnailPath,
@@ -304,4 +314,10 @@ final toyByIdProvider = FutureProvider.family<Toy?, int>((ref, id) async {
   } catch (e) {
     return null;
   }
+});
+
+// Additional images for a toy
+final toyImagesProvider = FutureProvider.family<List<ToyImage>, int>((ref, toyId) async {
+  final db = ref.watch(databaseProvider);
+  return db.getImagesForToy(toyId);
 });
