@@ -31,6 +31,8 @@ dependencies:
 
   # AI Recognition
   google_mlkit_image_labeling: ^0.11.0
+  anthropic_sdk_dart: ^1.4.1
+  flutter_dotenv: ^5.2.1
 
   # Sharing
   share_plus: ^10.1.4
@@ -47,3 +49,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env
