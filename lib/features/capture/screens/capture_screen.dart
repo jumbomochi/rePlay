@@ -28,6 +28,7 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
   List<String> _aiLabels = [];
   bool _isProcessing = false;
   bool _isSaving = false;
+  bool _isIdentifying = false;
 
   // Lifecycle fields
   String _condition = 'good';
@@ -78,6 +79,7 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
                       _buildCategoryDropdown(categories),
                       const SizedBox(height: 16),
                       if (_aiLabels.isNotEmpty) _buildAILabelsSection(),
+                      if (_imagePath != null) _buildIdentifyButton(),
                       const SizedBox(height: 16),
                       _buildLifecycleSection(),
                       const SizedBox(height: 24),
@@ -320,6 +322,62 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
           : const Icon(Icons.save),
       label: Text(_isSaving ? 'Saving...' : 'Save Toy'),
     );
+  }
+
+  Widget _buildIdentifyButton() {
+    final visionService = ref.read(visionIdentificationServiceProvider);
+    if (!visionService.isConfigured) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: OutlinedButton.icon(
+        onPressed: _isIdentifying ? null : _identifyWithAI,
+        icon: _isIdentifying
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.auto_awesome),
+        label: Text(_isIdentifying ? 'Identifying...' : 'Identify with AI'),
+      ),
+    );
+  }
+
+  Future<void> _identifyWithAI() async {
+    if (_imagePath == null) return;
+
+    setState(() {
+      _isIdentifying = true;
+    });
+
+    try {
+      final visionService = ref.read(visionIdentificationServiceProvider);
+      final result = await visionService.identifyToy(File(_imagePath!));
+
+      setState(() {
+        _nameController.text = result.name;
+        _descriptionController.text = result.description;
+        _selectedCategory = result.category;
+        _isIdentifying = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isIdentifying = false;
+      });
+
+      if (mounted) {
+        String message = 'Could not identify toy. Try again.';
+        if (e.toString().contains('API key')) {
+          message = 'Could not identify toy. Check your API key.';
+        } else if (e.toString().contains('TimeoutException')) {
+          message = 'Request timed out. Try again.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    }
   }
 
   void _showImageSourceDialog() {
