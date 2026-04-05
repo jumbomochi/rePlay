@@ -38,6 +38,7 @@ class InventoryState {
   final SortOption sortBy;
   final bool isMultiSelectMode;
   final Set<int> selectedToyIds;
+  final String? selectedOwner;
 
   InventoryState({
     this.toys = const [],
@@ -49,6 +50,7 @@ class InventoryState {
     this.sortBy = SortOption.newestFirst,
     this.isMultiSelectMode = false,
     this.selectedToyIds = const {},
+    this.selectedOwner,
   });
 
   InventoryState copyWith({
@@ -61,6 +63,7 @@ class InventoryState {
     SortOption? sortBy,
     bool? isMultiSelectMode,
     Set<int>? selectedToyIds,
+    String? selectedOwner,
   }) {
     return InventoryState(
       toys: toys ?? this.toys,
@@ -72,6 +75,7 @@ class InventoryState {
       sortBy: sortBy ?? this.sortBy,
       isMultiSelectMode: isMultiSelectMode ?? this.isMultiSelectMode,
       selectedToyIds: selectedToyIds ?? this.selectedToyIds,
+      selectedOwner: selectedOwner ?? this.selectedOwner,
     );
   }
 
@@ -86,13 +90,18 @@ class InventoryState {
       result = result.where((t) => t.category == selectedCategory).toList();
     }
 
+    if (selectedOwner != null && selectedOwner!.isNotEmpty) {
+      result = result.where((t) => t.owner == selectedOwner).toList();
+    }
+
     if (searchQuery.isNotEmpty) {
       final query = searchQuery.toLowerCase();
       result = result.where((t) {
         return t.name.toLowerCase().contains(query) ||
             (t.description?.toLowerCase().contains(query) ?? false) ||
             t.aiLabels.toLowerCase().contains(query) ||
-            (t.location?.toLowerCase().contains(query) ?? false);
+            (t.location?.toLowerCase().contains(query) ?? false) ||
+            (t.owner?.toLowerCase().contains(query) ?? false);
       }).toList();
     }
 
@@ -147,6 +156,7 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
     String? condition,
     String? location,
     String? status,
+    String? owner,
   }) async {
     try {
       final id = await _db.insertToy(ToysCompanion.insert(
@@ -159,6 +169,7 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
         condition: Value(condition ?? 'good'),
         location: Value(location),
         status: Value(status ?? 'active'),
+        owner: Value(owner),
       ));
 
       await _loadToys();
@@ -177,6 +188,7 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
     String? condition,
     String? location,
     String? status,
+    String? owner,
   }) async {
     try {
       final existing = await _db.getToyById(id);
@@ -193,6 +205,7 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
         condition: Value(condition ?? existing.condition),
         location: Value(location ?? existing.location),
         status: Value(status ?? existing.status),
+        owner: Value(owner ?? existing.owner),
       ));
       await _loadToys();
       return true;
@@ -240,6 +253,10 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
     state = state.copyWith(selectedStatus: status);
   }
 
+  void setOwner(String? owner) {
+    state = state.copyWith(selectedOwner: owner);
+  }
+
   void setSortOption(SortOption option) {
     state = state.copyWith(sortBy: option);
   }
@@ -250,6 +267,7 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
       searchQuery: '',
       selectedStatus: null,
       sortBy: SortOption.newestFirst,
+      selectedOwner: null,
     );
   }
 
