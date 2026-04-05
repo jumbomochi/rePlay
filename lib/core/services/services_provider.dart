@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'ai_recognition_service.dart';
+import 'backup_service.dart';
 import 'claude_vision_service.dart';
 import 'export_service.dart';
 import 'image_storage_service.dart';
@@ -21,4 +22,8 @@ final exportServiceProvider = Provider<ExportService>((ref) {
 
 final visionIdentificationServiceProvider = Provider<ClaudeVisionService>((ref) {
   return ClaudeVisionService();
+});
+
+final backupServiceProvider = Provider<BackupService>((ref) {
+  return BackupService();
 });
