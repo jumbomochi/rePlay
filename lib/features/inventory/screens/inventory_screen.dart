@@ -8,6 +8,7 @@ import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/category_filter_chips.dart';
+import '../widgets/location_autocomplete_field.dart';
 import '../widgets/owner_filter_chips.dart';
 import '../widgets/status_filter_tabs.dart';
 import '../widgets/toy_grid.dart';
@@ -309,12 +310,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Change Location'),
-          content: TextField(
+          content: LocationAutocompleteField(
             controller: locationController,
+            onChanged: (_) {},
             decoration: const InputDecoration(
               hintText: 'Enter location...',
             ),
-            autofocus: true,
           ),
           actions: [
             TextButton(

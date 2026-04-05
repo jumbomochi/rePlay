@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../../inventory/providers/inventory_provider.dart';
+import '../../inventory/widgets/location_autocomplete_field.dart';
 
 class CaptureScreen extends ConsumerStatefulWidget {
   const CaptureScreen({super.key});
@@ -281,13 +282,8 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
                 const SizedBox(height: 16),
 
                 // Location field
-                TextFormField(
+                LocationAutocompleteField(
                   controller: _locationController,
-                  decoration: const InputDecoration(
-                    labelText: 'Location (optional)',
-                    prefixIcon: Icon(Icons.location_on),
-                    hintText: 'e.g., Bedroom, Toy Box',
-                  ),
                   onChanged: (value) {
                     _location = value.isNotEmpty ? value : null;
                   },

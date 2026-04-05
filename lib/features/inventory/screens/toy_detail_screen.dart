@@ -11,6 +11,7 @@ import '../../../core/database/database.dart';
 import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
+import '../widgets/location_autocomplete_field.dart';
 import '../widgets/photo_gallery_strip.dart';
 
 class ToyDetailScreen extends ConsumerStatefulWidget {
@@ -404,13 +405,8 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
               const SizedBox(height: 16),
 
               // Location text field
-              TextFormField(
+              LocationAutocompleteField(
                 controller: _locationController,
-                decoration: const InputDecoration(
-                  labelText: 'Location',
-                  hintText: 'e.g., Playroom shelf, Garage bin 2',
-                  prefixIcon: Icon(Icons.location_on),
-                ),
                 onChanged: (value) {
                   setState(() {
                     _location = value.isNotEmpty ? value : null;
