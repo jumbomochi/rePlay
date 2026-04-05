@@ -8,6 +8,7 @@ import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/category_filter_chips.dart';
+import '../widgets/owner_filter_chips.dart';
 import '../widgets/status_filter_tabs.dart';
 import '../widgets/toy_grid.dart';
 import 'toy_detail_screen.dart';
@@ -116,6 +117,14 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               toys: inventoryState.toys,
               onCategorySelected: (category) {
                 ref.read(inventoryProvider.notifier).setCategory(category);
+              },
+            ),
+            const SizedBox(height: 8),
+            OwnerFilterChips(
+              selectedOwner: inventoryState.selectedOwner,
+              toys: inventoryState.toys,
+              onOwnerSelected: (owner) {
+                ref.read(inventoryProvider.notifier).setOwner(owner);
               },
             ),
             Padding(

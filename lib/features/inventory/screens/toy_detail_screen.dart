@@ -36,12 +36,15 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
   String _status = 'active';
   final _locationController = TextEditingController();
   bool _lifecycleExpanded = false;
+  String? _owner;
+  final _ownerController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
+    _ownerController.dispose();
     super.dispose();
   }
 
@@ -76,6 +79,8 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
           _location = toy.location;
           _locationController.text = toy.location ?? '';
           _status = toy.status;
+          _owner = toy.owner;
+          _ownerController.text = toy.owner ?? '';
         }
 
         final aiLabels = _parseAiLabels(toy.aiLabels);
@@ -214,6 +219,23 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
         ),
         const SizedBox(height: 16),
 
+        // Owner
+        if (toy.owner != null && toy.owner!.isNotEmpty) ...[
+          Row(
+            children: [
+              Icon(Icons.person, color: theme.colorScheme.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Text(
+                toy.owner!,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
+
         // Description
         if (toy.description != null && toy.description.isNotEmpty) ...[
           Text(
@@ -314,6 +336,20 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
                 _hasChanges = true;
               });
             }
+          },
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _ownerController,
+          decoration: const InputDecoration(
+            labelText: 'Owner (optional)',
+            prefixIcon: Icon(Icons.person),
+          ),
+          onChanged: (value) {
+            setState(() {
+              _owner = value.isNotEmpty ? value : null;
+              _hasChanges = true;
+            });
           },
         ),
         const SizedBox(height: 16),
@@ -442,6 +478,7 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
           condition: _condition,
           location: _location,
           status: _status,
+          owner: _owner,
         );
 
     if (success && mounted) {

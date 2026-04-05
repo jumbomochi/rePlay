@@ -34,12 +34,15 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
   String _condition = 'good';
   String? _location;
   String _status = 'active';
+  String? _owner;
+  final _ownerController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
+    _ownerController.dispose();
     super.dispose();
   }
 
@@ -77,6 +80,18 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
                       _buildDescriptionField(),
                       const SizedBox(height: 16),
                       _buildCategoryDropdown(categories),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _ownerController,
+                        decoration: const InputDecoration(
+                          labelText: 'Owner (optional)',
+                          prefixIcon: Icon(Icons.person),
+                          hintText: "e.g., Jake, Emma",
+                        ),
+                        onChanged: (value) {
+                          _owner = value.isNotEmpty ? value : null;
+                        },
+                      ),
                       const SizedBox(height: 16),
                       if (_aiLabels.isNotEmpty) _buildAILabelsSection(),
                       if (_imagePath != null) _buildIdentifyButton(),
@@ -485,6 +500,7 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
             condition: _condition,
             location: _location,
             status: _status,
+            owner: _owner,
           );
 
       if (mounted) {
