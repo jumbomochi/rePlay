@@ -13,6 +13,7 @@ class Toys extends Table {
   TextColumn get condition => text().withDefault(const Constant('good'))();
   TextColumn get location => text().nullable()();
   TextColumn get status => text().withDefault(const Constant('active'))();
+  TextColumn get owner => text().nullable()();
 }
 
 class Categories extends Table {
