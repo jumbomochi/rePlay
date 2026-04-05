@@ -282,7 +282,67 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
+        const SizedBox(height: 24),
+        _buildHistorySection(),
       ],
+    );
+  }
+
+  Widget _buildHistorySection() {
+    final historyAsync = ref.watch(toyHistoryProvider(widget.toyId));
+
+    return historyAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (e, st) => const SizedBox.shrink(),
+      data: (history) {
+        if (history.isEmpty) return const SizedBox.shrink();
+
+        final theme = Theme.of(context);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'History',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...history.map((entry) {
+              final date = '${entry.createdAt.month}/${entry.createdAt.day}';
+              final fieldLabel = entry.field == 'status' ? 'Status' : 'Condition';
+              final oldLabel = entry.field == 'status'
+                  ? AppConstants.getStatusLabel(entry.oldValue)
+                  : AppConstants.getConditionLabel(entry.oldValue);
+              final newLabel = entry.field == 'status'
+                  ? AppConstants.getStatusLabel(entry.newValue)
+                  : AppConstants.getConditionLabel(entry.newValue);
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      date,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '$fieldLabel: $oldLabel → $newLabel',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        );
+      },
     );
   }
 
