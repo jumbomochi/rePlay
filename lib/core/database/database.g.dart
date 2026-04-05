@@ -1449,12 +1449,407 @@ class ToyImagesCompanion extends UpdateCompanion<ToyImage> {
   }
 }
 
+class $ToyHistoryTable extends ToyHistory
+    with TableInfo<$ToyHistoryTable, ToyHistoryData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ToyHistoryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _toyIdMeta = const VerificationMeta('toyId');
+  @override
+  late final GeneratedColumn<int> toyId = GeneratedColumn<int>(
+    'toy_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fieldMeta = const VerificationMeta('field');
+  @override
+  late final GeneratedColumn<String> field = GeneratedColumn<String>(
+    'field',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _oldValueMeta = const VerificationMeta(
+    'oldValue',
+  );
+  @override
+  late final GeneratedColumn<String> oldValue = GeneratedColumn<String>(
+    'old_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _newValueMeta = const VerificationMeta(
+    'newValue',
+  );
+  @override
+  late final GeneratedColumn<String> newValue = GeneratedColumn<String>(
+    'new_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    toyId,
+    field,
+    oldValue,
+    newValue,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'toy_history';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ToyHistoryData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('toy_id')) {
+      context.handle(
+        _toyIdMeta,
+        toyId.isAcceptableOrUnknown(data['toy_id']!, _toyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_toyIdMeta);
+    }
+    if (data.containsKey('field')) {
+      context.handle(
+        _fieldMeta,
+        field.isAcceptableOrUnknown(data['field']!, _fieldMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fieldMeta);
+    }
+    if (data.containsKey('old_value')) {
+      context.handle(
+        _oldValueMeta,
+        oldValue.isAcceptableOrUnknown(data['old_value']!, _oldValueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_oldValueMeta);
+    }
+    if (data.containsKey('new_value')) {
+      context.handle(
+        _newValueMeta,
+        newValue.isAcceptableOrUnknown(data['new_value']!, _newValueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_newValueMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ToyHistoryData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ToyHistoryData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      toyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}toy_id'],
+      )!,
+      field: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}field'],
+      )!,
+      oldValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}old_value'],
+      )!,
+      newValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}new_value'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ToyHistoryTable createAlias(String alias) {
+    return $ToyHistoryTable(attachedDatabase, alias);
+  }
+}
+
+class ToyHistoryData extends DataClass implements Insertable<ToyHistoryData> {
+  final int id;
+  final int toyId;
+  final String field;
+  final String oldValue;
+  final String newValue;
+  final DateTime createdAt;
+  const ToyHistoryData({
+    required this.id,
+    required this.toyId,
+    required this.field,
+    required this.oldValue,
+    required this.newValue,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['toy_id'] = Variable<int>(toyId);
+    map['field'] = Variable<String>(field);
+    map['old_value'] = Variable<String>(oldValue);
+    map['new_value'] = Variable<String>(newValue);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ToyHistoryCompanion toCompanion(bool nullToAbsent) {
+    return ToyHistoryCompanion(
+      id: Value(id),
+      toyId: Value(toyId),
+      field: Value(field),
+      oldValue: Value(oldValue),
+      newValue: Value(newValue),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ToyHistoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ToyHistoryData(
+      id: serializer.fromJson<int>(json['id']),
+      toyId: serializer.fromJson<int>(json['toyId']),
+      field: serializer.fromJson<String>(json['field']),
+      oldValue: serializer.fromJson<String>(json['oldValue']),
+      newValue: serializer.fromJson<String>(json['newValue']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'toyId': serializer.toJson<int>(toyId),
+      'field': serializer.toJson<String>(field),
+      'oldValue': serializer.toJson<String>(oldValue),
+      'newValue': serializer.toJson<String>(newValue),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ToyHistoryData copyWith({
+    int? id,
+    int? toyId,
+    String? field,
+    String? oldValue,
+    String? newValue,
+    DateTime? createdAt,
+  }) => ToyHistoryData(
+    id: id ?? this.id,
+    toyId: toyId ?? this.toyId,
+    field: field ?? this.field,
+    oldValue: oldValue ?? this.oldValue,
+    newValue: newValue ?? this.newValue,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ToyHistoryData copyWithCompanion(ToyHistoryCompanion data) {
+    return ToyHistoryData(
+      id: data.id.present ? data.id.value : this.id,
+      toyId: data.toyId.present ? data.toyId.value : this.toyId,
+      field: data.field.present ? data.field.value : this.field,
+      oldValue: data.oldValue.present ? data.oldValue.value : this.oldValue,
+      newValue: data.newValue.present ? data.newValue.value : this.newValue,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ToyHistoryData(')
+          ..write('id: $id, ')
+          ..write('toyId: $toyId, ')
+          ..write('field: $field, ')
+          ..write('oldValue: $oldValue, ')
+          ..write('newValue: $newValue, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, toyId, field, oldValue, newValue, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ToyHistoryData &&
+          other.id == this.id &&
+          other.toyId == this.toyId &&
+          other.field == this.field &&
+          other.oldValue == this.oldValue &&
+          other.newValue == this.newValue &&
+          other.createdAt == this.createdAt);
+}
+
+class ToyHistoryCompanion extends UpdateCompanion<ToyHistoryData> {
+  final Value<int> id;
+  final Value<int> toyId;
+  final Value<String> field;
+  final Value<String> oldValue;
+  final Value<String> newValue;
+  final Value<DateTime> createdAt;
+  const ToyHistoryCompanion({
+    this.id = const Value.absent(),
+    this.toyId = const Value.absent(),
+    this.field = const Value.absent(),
+    this.oldValue = const Value.absent(),
+    this.newValue = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  ToyHistoryCompanion.insert({
+    this.id = const Value.absent(),
+    required int toyId,
+    required String field,
+    required String oldValue,
+    required String newValue,
+    this.createdAt = const Value.absent(),
+  }) : toyId = Value(toyId),
+       field = Value(field),
+       oldValue = Value(oldValue),
+       newValue = Value(newValue);
+  static Insertable<ToyHistoryData> custom({
+    Expression<int>? id,
+    Expression<int>? toyId,
+    Expression<String>? field,
+    Expression<String>? oldValue,
+    Expression<String>? newValue,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (toyId != null) 'toy_id': toyId,
+      if (field != null) 'field': field,
+      if (oldValue != null) 'old_value': oldValue,
+      if (newValue != null) 'new_value': newValue,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  ToyHistoryCompanion copyWith({
+    Value<int>? id,
+    Value<int>? toyId,
+    Value<String>? field,
+    Value<String>? oldValue,
+    Value<String>? newValue,
+    Value<DateTime>? createdAt,
+  }) {
+    return ToyHistoryCompanion(
+      id: id ?? this.id,
+      toyId: toyId ?? this.toyId,
+      field: field ?? this.field,
+      oldValue: oldValue ?? this.oldValue,
+      newValue: newValue ?? this.newValue,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (toyId.present) {
+      map['toy_id'] = Variable<int>(toyId.value);
+    }
+    if (field.present) {
+      map['field'] = Variable<String>(field.value);
+    }
+    if (oldValue.present) {
+      map['old_value'] = Variable<String>(oldValue.value);
+    }
+    if (newValue.present) {
+      map['new_value'] = Variable<String>(newValue.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ToyHistoryCompanion(')
+          ..write('id: $id, ')
+          ..write('toyId: $toyId, ')
+          ..write('field: $field, ')
+          ..write('oldValue: $oldValue, ')
+          ..write('newValue: $newValue, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ToysTable toys = $ToysTable(this);
   late final $CategoriesTable categories = $CategoriesTable(this);
   late final $ToyImagesTable toyImages = $ToyImagesTable(this);
+  late final $ToyHistoryTable toyHistory = $ToyHistoryTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1463,6 +1858,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     toys,
     categories,
     toyImages,
+    toyHistory,
   ];
 }
 
@@ -2186,6 +2582,219 @@ typedef $$ToyImagesTableProcessedTableManager =
       ToyImage,
       PrefetchHooks Function()
     >;
+typedef $$ToyHistoryTableCreateCompanionBuilder =
+    ToyHistoryCompanion Function({
+      Value<int> id,
+      required int toyId,
+      required String field,
+      required String oldValue,
+      required String newValue,
+      Value<DateTime> createdAt,
+    });
+typedef $$ToyHistoryTableUpdateCompanionBuilder =
+    ToyHistoryCompanion Function({
+      Value<int> id,
+      Value<int> toyId,
+      Value<String> field,
+      Value<String> oldValue,
+      Value<String> newValue,
+      Value<DateTime> createdAt,
+    });
+
+class $$ToyHistoryTableFilterComposer
+    extends Composer<_$AppDatabase, $ToyHistoryTable> {
+  $$ToyHistoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get toyId => $composableBuilder(
+    column: $table.toyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get field => $composableBuilder(
+    column: $table.field,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get oldValue => $composableBuilder(
+    column: $table.oldValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get newValue => $composableBuilder(
+    column: $table.newValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ToyHistoryTableOrderingComposer
+    extends Composer<_$AppDatabase, $ToyHistoryTable> {
+  $$ToyHistoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get toyId => $composableBuilder(
+    column: $table.toyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get field => $composableBuilder(
+    column: $table.field,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get oldValue => $composableBuilder(
+    column: $table.oldValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get newValue => $composableBuilder(
+    column: $table.newValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ToyHistoryTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ToyHistoryTable> {
+  $$ToyHistoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get toyId =>
+      $composableBuilder(column: $table.toyId, builder: (column) => column);
+
+  GeneratedColumn<String> get field =>
+      $composableBuilder(column: $table.field, builder: (column) => column);
+
+  GeneratedColumn<String> get oldValue =>
+      $composableBuilder(column: $table.oldValue, builder: (column) => column);
+
+  GeneratedColumn<String> get newValue =>
+      $composableBuilder(column: $table.newValue, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ToyHistoryTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ToyHistoryTable,
+          ToyHistoryData,
+          $$ToyHistoryTableFilterComposer,
+          $$ToyHistoryTableOrderingComposer,
+          $$ToyHistoryTableAnnotationComposer,
+          $$ToyHistoryTableCreateCompanionBuilder,
+          $$ToyHistoryTableUpdateCompanionBuilder,
+          (
+            ToyHistoryData,
+            BaseReferences<_$AppDatabase, $ToyHistoryTable, ToyHistoryData>,
+          ),
+          ToyHistoryData,
+          PrefetchHooks Function()
+        > {
+  $$ToyHistoryTableTableManager(_$AppDatabase db, $ToyHistoryTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ToyHistoryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ToyHistoryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ToyHistoryTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> toyId = const Value.absent(),
+                Value<String> field = const Value.absent(),
+                Value<String> oldValue = const Value.absent(),
+                Value<String> newValue = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => ToyHistoryCompanion(
+                id: id,
+                toyId: toyId,
+                field: field,
+                oldValue: oldValue,
+                newValue: newValue,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int toyId,
+                required String field,
+                required String oldValue,
+                required String newValue,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => ToyHistoryCompanion.insert(
+                id: id,
+                toyId: toyId,
+                field: field,
+                oldValue: oldValue,
+                newValue: newValue,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ToyHistoryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ToyHistoryTable,
+      ToyHistoryData,
+      $$ToyHistoryTableFilterComposer,
+      $$ToyHistoryTableOrderingComposer,
+      $$ToyHistoryTableAnnotationComposer,
+      $$ToyHistoryTableCreateCompanionBuilder,
+      $$ToyHistoryTableUpdateCompanionBuilder,
+      (
+        ToyHistoryData,
+        BaseReferences<_$AppDatabase, $ToyHistoryTable, ToyHistoryData>,
+      ),
+      ToyHistoryData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2195,4 +2804,6 @@ class $AppDatabaseManager {
       $$CategoriesTableTableManager(_db, _db.categories);
   $$ToyImagesTableTableManager get toyImages =>
       $$ToyImagesTableTableManager(_db, _db.toyImages);
+  $$ToyHistoryTableTableManager get toyHistory =>
+      $$ToyHistoryTableTableManager(_db, _db.toyHistory);
 }

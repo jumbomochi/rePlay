@@ -9,12 +9,12 @@ import 'tables/toys_table.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Toys, Categories, ToyImages])
+@DriftDatabase(tables: [Toys, Categories, ToyImages, ToyHistory])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -34,6 +34,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 4) {
           await m.addColumn(toys, toys.owner);
+        }
+        if (from < 5) {
+          await m.createTable(toyHistory);
         }
       },
     );
@@ -134,6 +137,22 @@ class AppDatabase extends _$AppDatabase {
 
   Future<int> deleteImagesForToy(int toyId) {
     return (delete(toyImages)..where((t) => t.toyId.equals(toyId))).go();
+  }
+
+  // ToyHistory operations
+  Future<List<ToyHistoryData>> getHistoryForToy(int toyId) {
+    return (select(toyHistory)
+          ..where((t) => t.toyId.equals(toyId))
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
+  }
+
+  Future<int> insertHistory(ToyHistoryCompanion entry) {
+    return into(toyHistory).insert(entry);
+  }
+
+  Future<int> deleteHistoryForToy(int toyId) {
+    return (delete(toyHistory)..where((t) => t.toyId.equals(toyId))).go();
   }
 
   Future<int> countImagesForToy(int toyId) async {

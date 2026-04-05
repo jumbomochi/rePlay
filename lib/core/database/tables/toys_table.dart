@@ -31,3 +31,12 @@ class ToyImages extends Table {
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class ToyHistory extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get toyId => integer()();
+  TextColumn get field => text()();
+  TextColumn get oldValue => text()();
+  TextColumn get newValue => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
