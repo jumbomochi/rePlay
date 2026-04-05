@@ -192,6 +192,23 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
   }) async {
     try {
       final existing = await _db.getToyById(id);
+      // Record history for status and condition changes
+      if (status != null && status != existing.status) {
+        await _db.insertHistory(ToyHistoryCompanion.insert(
+          toyId: id,
+          field: 'status',
+          oldValue: existing.status,
+          newValue: status,
+        ));
+      }
+      if (condition != null && condition != existing.condition) {
+        await _db.insertHistory(ToyHistoryCompanion.insert(
+          toyId: id,
+          field: 'condition',
+          oldValue: existing.condition,
+          newValue: condition,
+        ));
+      }
       await _db.updateToy(ToysCompanion(
         id: Value(id),
         name: Value(name ?? existing.name),
@@ -232,6 +249,7 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
         toy.imagePath,
         thumbnailPath: toy.thumbnailPath,
       );
+      await _db.deleteHistoryForToy(id);
       await _db.deleteToy(id);
       await _loadToys();
       return true;
@@ -338,4 +356,10 @@ final toyByIdProvider = FutureProvider.family<Toy?, int>((ref, id) async {
 final toyImagesProvider = FutureProvider.family<List<ToyImage>, int>((ref, toyId) async {
   final db = ref.watch(databaseProvider);
   return db.getImagesForToy(toyId);
+});
+
+// History for a toy
+final toyHistoryProvider = FutureProvider.family<List<ToyHistoryData>, int>((ref, toyId) async {
+  final db = ref.watch(databaseProvider);
+  return db.getHistoryForToy(toyId);
 });
