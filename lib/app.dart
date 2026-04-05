@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'features/inventory/screens/inventory_screen.dart';
+import 'features/settings/screens/settings_screen.dart';
 import 'features/stats/screens/stats_screen.dart';
 import 'shared/theme/app_theme.dart';
 
@@ -17,6 +18,7 @@ class _RePlayAppState extends State<RePlayApp> {
   static const _screens = <Widget>[
     InventoryScreen(),
     StatsScreen(),
+    SettingsScreen(),
   ];
 
   @override
@@ -49,6 +51,11 @@ class _RePlayAppState extends State<RePlayApp> {
               icon: Icon(Icons.bar_chart_outlined),
               selectedIcon: Icon(Icons.bar_chart),
               label: 'Stats',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings),
+              label: 'Settings',
             ),
           ],
         ),
