@@ -119,6 +119,27 @@ class AppDatabase extends _$AppDatabase {
   Stream<List<Category>> watchAllCategories() =>
       (select(categories)..orderBy([(c) => OrderingTerm.asc(c.sortOrder)])).watch();
 
+  Future<int> insertCategory(String name) {
+    return into(categories).insert(CategoriesCompanion.insert(
+      name: name,
+      iconName: const Value('category'),
+      sortOrder: Value(100),
+    ));
+  }
+
+  Future<int> deleteCategoryById(int id) {
+    return (delete(categories)..where((c) => c.id.equals(id))).go();
+  }
+
+  Future<int> countToysByCategory(String categoryName) async {
+    final count = countAll();
+    final query = selectOnly(toys)
+      ..addColumns([count])
+      ..where(toys.category.equals(categoryName));
+    final result = await query.getSingle();
+    return result.read(count) ?? 0;
+  }
+
   // ToyImages operations
   Future<List<ToyImage>> getImagesForToy(int toyId) {
     return (select(toyImages)

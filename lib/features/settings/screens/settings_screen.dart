@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/database/database.dart';
 import '../../../core/services/services_provider.dart';
 import '../../inventory/providers/inventory_provider.dart';
+import 'manage_categories_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -36,6 +37,21 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Import Backup'),
             subtitle: const Text('Restore toys from a JSON backup file'),
             onTap: () => _importBackup(context, ref),
+          ),
+          const Divider(),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: Text('Customization', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.category),
+            title: const Text('Manage Categories'),
+            subtitle: const Text('Add or remove toy categories'),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const ManageCategoriesScreen(),
+              ),
+            ),
           ),
         ],
       ),
