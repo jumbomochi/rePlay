@@ -38,6 +38,8 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
   String? _owner;
   final _ownerController = TextEditingController();
 
+  bool _showDesktopBanner = !Platform.isIOS && !Platform.isAndroid;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -73,6 +75,21 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (_showDesktopBanner) ...[
+                      MaterialBanner(
+                        content: const Text(
+                          'Running on desktop — AI labels and barcode scanning require a mobile device. Use "Identify with AI" for toy recognition.',
+                        ),
+                        leading: const Icon(Icons.info_outline),
+                        actions: [
+                          TextButton(
+                            onPressed: () => setState(() => _showDesktopBanner = false),
+                            child: const Text('Dismiss'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                     _buildImageSection(),
                     const SizedBox(height: 24),
                     if (_imagePath != null) ...[
