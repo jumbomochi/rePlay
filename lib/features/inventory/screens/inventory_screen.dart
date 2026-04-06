@@ -133,6 +133,13 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  IconButton(
+                    icon: Icon(inventoryState.isListView ? Icons.grid_view : Icons.view_list),
+                    tooltip: inventoryState.isListView ? 'Grid view' : 'List view',
+                    onPressed: () {
+                      ref.read(inventoryProvider.notifier).toggleViewMode();
+                    },
+                  ),
                   DropdownButton<SortOption>(
                     value: inventoryState.sortBy,
                     underline: const SizedBox.shrink(),
@@ -160,6 +167,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 searchQuery: inventoryState.searchQuery,
                 isMultiSelectMode: isMultiSelect,
                 selectedToyIds: inventoryState.selectedToyIds,
+                isListView: inventoryState.isListView,
                 onToyTap: isMultiSelect
                     ? (toy) => ref.read(inventoryProvider.notifier).toggleSelection(toy.id)
                     : (toy) => _navigateToDetail(toy.id),

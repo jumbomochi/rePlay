@@ -39,6 +39,7 @@ class InventoryState {
   final bool isMultiSelectMode;
   final Set<int> selectedToyIds;
   final String? selectedOwner;
+  final bool isListView;
 
   InventoryState({
     this.toys = const [],
@@ -51,6 +52,7 @@ class InventoryState {
     this.isMultiSelectMode = false,
     this.selectedToyIds = const {},
     this.selectedOwner,
+    this.isListView = false,
   });
 
   InventoryState copyWith({
@@ -64,6 +66,7 @@ class InventoryState {
     bool? isMultiSelectMode,
     Set<int>? selectedToyIds,
     String? selectedOwner,
+    bool? isListView,
   }) {
     return InventoryState(
       toys: toys ?? this.toys,
@@ -76,6 +79,7 @@ class InventoryState {
       isMultiSelectMode: isMultiSelectMode ?? this.isMultiSelectMode,
       selectedToyIds: selectedToyIds ?? this.selectedToyIds,
       selectedOwner: selectedOwner ?? this.selectedOwner,
+      isListView: isListView ?? this.isListView,
     );
   }
 
@@ -287,6 +291,10 @@ class InventoryNotifier extends StateNotifier<InventoryState> {
       sortBy: SortOption.newestFirst,
       selectedOwner: null,
     );
+  }
+
+  void toggleViewMode() {
+    state = state.copyWith(isListView: !state.isListView);
   }
 
   void enterMultiSelect(int toyId) {

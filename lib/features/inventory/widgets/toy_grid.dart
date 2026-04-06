@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/database/database.dart';
 import 'toy_card.dart';
+import 'toy_list_item.dart';
 
 class ToyGrid extends StatelessWidget {
   final List<Toy> toys;
@@ -11,6 +12,7 @@ class ToyGrid extends StatelessWidget {
   final String searchQuery;
   final bool isMultiSelectMode;
   final Set<int> selectedToyIds;
+  final bool isListView;
 
   const ToyGrid({
     super.key,
@@ -21,6 +23,7 @@ class ToyGrid extends StatelessWidget {
     this.searchQuery = '',
     this.isMultiSelectMode = false,
     this.selectedToyIds = const {},
+    this.isListView = false,
   });
 
   @override
@@ -62,6 +65,22 @@ class ToyGrid extends StatelessWidget {
             ),
           ],
         ),
+      );
+    }
+
+    if (isListView) {
+      return ListView.builder(
+        itemCount: toys.length,
+        itemBuilder: (context, index) {
+          final toy = toys[index];
+          return ToyListItem(
+            toy: toy,
+            onTap: onToyTap != null ? () => onToyTap!(toy) : null,
+            onLongPress: onToyLongPress != null ? () => onToyLongPress!(toy) : null,
+            isSelected: selectedToyIds.contains(toy.id),
+            isMultiSelectMode: isMultiSelectMode,
+          );
+        },
       );
     }
 
