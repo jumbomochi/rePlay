@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/barcode_lookup_service.dart';
 import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../../inventory/providers/inventory_provider.dart';
 import '../../inventory/widgets/location_autocomplete_field.dart';
+import 'barcode_scanner_screen.dart';
 
 class CaptureScreen extends ConsumerStatefulWidget {
   const CaptureScreen({super.key});
@@ -431,6 +433,15 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
                   _captureImage(ImageSource.gallery);
                 },
               ),
+              if (Platform.isIOS || Platform.isAndroid)
+                ListTile(
+                  leading: const Icon(Icons.qr_code_scanner),
+                  title: const Text('Scan Barcode'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _scanBarcode();
+                  },
+                ),
             ],
           ),
         );
@@ -484,6 +495,25 @@ class _CaptureScreenState extends ConsumerState<CaptureScreen> {
           SnackBar(content: Text('Error processing image: $e')),
         );
       }
+    }
+  }
+
+  Future<void> _scanBarcode() async {
+    final barcode = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
+    );
+    if (barcode == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Looking up barcode $barcode...')),
+    );
+    final lookupService = BarcodeLookupService();
+    final productName = await lookupService.lookupBarcode(barcode);
+    if (!mounted) return;
+    if (productName != null && productName.isNotEmpty) {
+      setState(() { _nameController.text = productName; });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Found: $productName')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product not found. Enter name manually.')));
     }
   }
 
