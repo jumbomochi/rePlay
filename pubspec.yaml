@@ -28,6 +28,7 @@ dependencies:
   camera: ^0.10.5+7
   image_picker: ^1.0.5
   image: ^4.1.4
+  mobile_scanner: ^6.0.5
 
   # AI Recognition
   google_mlkit_image_labeling: ^0.11.0
@@ -40,6 +41,7 @@ dependencies:
 
   # Utilities
   uuid: ^4.2.2
+  shared_preferences: ^2.3.4
 
 dev_dependencies:
   flutter_test:
