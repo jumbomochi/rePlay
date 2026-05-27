@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:replay/core/database/database.dart';
 import 'package:replay/core/services/image_storage_service.dart';
+import 'package:replay/core/widgets/hero_tags.dart';
 import 'package:replay/features/categories/providers/categories_provider.dart';
 import 'package:replay/features/inventory/providers/inventory_provider.dart';
 import 'package:replay/features/inventory/screens/inventory_screen.dart';
@@ -270,6 +273,48 @@ void main() {
     expect(find.text('All (3)'), findsWidgets); // Appears in both status and category filters
     expect(find.text('Active (2)'), findsOneWidget);
     expect(find.text('To Donate (1)'), findsOneWidget);
+  });
+
+  testWidgets('Grid card wraps image in Hero with toyImageHeroTag', (WidgetTester tester) async {
+    final tempDir = Directory.systemTemp.createTempSync('hero_grid_test');
+    addTearDown(() => tempDir.deleteSync(recursive: true));
+    final imageFile = File('${tempDir.path}/cover.png')..writeAsBytesSync([0]);
+
+    final notifier = MockInventoryNotifier();
+    notifier.state = InventoryState(
+      toys: [
+        Toy(
+          id: 7,
+          name: 'HeroToy',
+          description: null,
+          imagePath: imageFile.path,
+          thumbnailPath: null,
+          category: 'Other',
+          aiLabels: '[]',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          condition: 'good',
+          location: null,
+          status: 'active',
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          inventoryProvider.overrideWith((ref) => notifier),
+          categoryNamesProvider.overrideWith((ref) => []),
+        ],
+        child: const MaterialApp(home: InventoryScreen()),
+      ),
+    );
+    await tester.pump();
+
+    final heroFinder = find.byWidgetPredicate(
+      (w) => w is Hero && w.tag == toyImageHeroTag(7),
+    );
+    expect(heroFinder, findsOneWidget);
   });
 }
 

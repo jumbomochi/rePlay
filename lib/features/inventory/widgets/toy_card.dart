@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/database.dart';
+import '../../../core/widgets/hero_tags.dart';
 
 class ToyCard extends StatelessWidget {
   final Toy toy;
@@ -179,20 +180,20 @@ class ToyCard extends StatelessWidget {
 
   Widget _buildImage() {
     final imagePath = toy.thumbnailPath ?? toy.imagePath;
+    if (imagePath.isEmpty) {
+      return _buildPlaceholder();
+    }
     final file = File(imagePath);
-
-    return FutureBuilder<bool>(
-      future: file.exists(),
-      builder: (context, snapshot) {
-        if (snapshot.data == true) {
-          return Image.file(
-            file,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
-          );
-        }
-        return _buildPlaceholder();
-      },
+    if (!file.existsSync()) {
+      return _buildPlaceholder();
+    }
+    return Hero(
+      tag: toyImageHeroTag(toy.id),
+      child: Image.file(
+        file,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      ),
     );
   }
 
