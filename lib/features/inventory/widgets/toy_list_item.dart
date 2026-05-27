@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/database.dart';
+import '../../../core/widgets/hero_tags.dart';
 
 class ToyListItem extends StatelessWidget {
   final Toy toy;
@@ -15,9 +16,15 @@ class ToyListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final thumbPath = toy.thumbnailPath ?? toy.imagePath;
     return ListTile(
-      leading: SizedBox(width: 48, height: 48, child: ClipRRect(borderRadius: BorderRadius.circular(6), child: FutureBuilder<bool>(future: File(thumbPath).exists(), builder: (context, snapshot) { if (snapshot.data == true) return Image.file(File(thumbPath), fit: BoxFit.cover); return Container(color: Colors.grey[200], child: Icon(Icons.toys, size: 24, color: Colors.grey[400])); }))),
+      leading: SizedBox(
+        width: 48,
+        height: 48,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: _buildLeading(),
+        ),
+      ),
       title: Text(toy.name, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Row(children: [
         Icon(AppConstants.getCategoryIcon(toy.category), size: 14, color: theme.colorScheme.onSurfaceVariant),
@@ -29,6 +36,32 @@ class ToyListItem extends StatelessWidget {
       selected: isSelected && isMultiSelectMode,
       onTap: onTap,
       onLongPress: onLongPress,
+    );
+  }
+
+  Widget _buildLeading() {
+    final thumbPath = toy.thumbnailPath ?? toy.imagePath;
+    if (thumbPath.isEmpty) {
+      return _placeholder();
+    }
+    final file = File(thumbPath);
+    if (!file.existsSync()) {
+      return _placeholder();
+    }
+    return Hero(
+      tag: toyImageHeroTag(toy.id),
+      child: Image.file(
+        file,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _placeholder(),
+      ),
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      color: Colors.grey[200],
+      child: Icon(Icons.toys, size: 24, color: Colors.grey[400]),
     );
   }
 }

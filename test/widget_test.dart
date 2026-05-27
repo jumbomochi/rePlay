@@ -316,6 +316,49 @@ void main() {
     );
     expect(heroFinder, findsOneWidget);
   });
+
+  testWidgets('List item wraps thumbnail in Hero with toyImageHeroTag', (WidgetTester tester) async {
+    final tempDir = Directory.systemTemp.createTempSync('hero_list_test');
+    addTearDown(() => tempDir.deleteSync(recursive: true));
+    final imageFile = File('${tempDir.path}/cover.png')..writeAsBytesSync([0]);
+
+    final notifier = MockInventoryNotifier();
+    notifier.state = InventoryState(
+      isListView: true,
+      toys: [
+        Toy(
+          id: 9,
+          name: 'ListToy',
+          description: null,
+          imagePath: imageFile.path,
+          thumbnailPath: null,
+          category: 'Other',
+          aiLabels: '[]',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          condition: 'good',
+          location: null,
+          status: 'active',
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          inventoryProvider.overrideWith((ref) => notifier),
+          categoryNamesProvider.overrideWith((ref) => []),
+        ],
+        child: const MaterialApp(home: InventoryScreen()),
+      ),
+    );
+    await tester.pump();
+
+    final heroFinder = find.byWidgetPredicate(
+      (w) => w is Hero && w.tag == toyImageHeroTag(9),
+    );
+    expect(heroFinder, findsOneWidget);
+  });
 }
 
 /// Mock inventory notifier that doesn't use real database
