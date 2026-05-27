@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/database.dart';
+import '../../../core/widgets/hero_tags.dart';
 import '../../../core/services/services_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../providers/inventory_provider.dart';
@@ -172,27 +173,48 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
       }
     }
 
-    return AspectRatio(
+    final showHero = _selectedPhotoIndex == 0 &&
+        imagePath.isNotEmpty &&
+        File(imagePath).existsSync();
+
+    final image = AspectRatio(
       aspectRatio: 1,
-      child: FutureBuilder<bool>(
-        future: File(imagePath).exists(),
-        builder: (context, snapshot) {
-          if (snapshot.data == true) {
-            return Image.file(
-              File(imagePath),
-              fit: BoxFit.cover,
-            );
-          }
-          return Container(
-            color: Colors.grey[200],
-            child: Icon(
-              Icons.toys,
-              size: 80,
-              color: Colors.grey[400],
+      child: imagePath.isNotEmpty && File(imagePath).existsSync()
+          ? Image.file(File(imagePath), fit: BoxFit.cover)
+          : Container(
+              color: Colors.grey[200],
+              child: Icon(Icons.toys, size: 80, color: Colors.grey[400]),
             ),
-          );
-        },
-      ),
+    );
+
+    if (!showHero) {
+      return image;
+    }
+
+    return Hero(
+      tag: toyImageHeroTag(toy.id),
+      flightShuttleBuilder: (flightContext, animation, direction, fromContext, toContext) {
+        final tween = BorderRadiusTween(
+          begin: BorderRadius.circular(8),
+          end: BorderRadius.zero,
+        );
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            final radius = direction == HeroFlightDirection.push
+                ? tween.evaluate(animation)!
+                : tween.evaluate(ReverseAnimation(animation))!;
+            return ClipRRect(
+              borderRadius: radius,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Image.file(File(imagePath), fit: BoxFit.cover),
+              ),
+            );
+          },
+        );
+      },
+      child: image,
     );
   }
 
