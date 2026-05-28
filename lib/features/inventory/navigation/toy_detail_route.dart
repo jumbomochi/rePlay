@@ -6,8 +6,9 @@ Route<void> toyDetailRoute(int toyId) {
   return PageRouteBuilder<void>(
     transitionDuration: const Duration(milliseconds: 350),
     reverseTransitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (_, __, ___) => ToyDetailScreen(toyId: toyId),
-    transitionsBuilder: (_, animation, __, child) =>
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        ToyDetailScreen(toyId: toyId),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
         FadeTransition(opacity: animation, child: child),
   );
 }
