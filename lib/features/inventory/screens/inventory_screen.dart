@@ -12,7 +12,7 @@ import '../widgets/location_autocomplete_field.dart';
 import '../widgets/owner_filter_chips.dart';
 import '../widgets/status_filter_tabs.dart';
 import '../widgets/toy_grid.dart';
-import 'toy_detail_screen.dart';
+import '../navigation/toy_detail_route.dart';
 import '../../capture/screens/capture_screen.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
@@ -359,14 +359,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   }
 
   void _navigateToDetail(int toyId) async {
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => ToyDetailScreen(toyId: toyId),
-      ),
-    );
-
-    if (result == true) {
-      ref.read(inventoryProvider.notifier).refresh();
-    }
+    await Navigator.of(context).push(toyDetailRoute(toyId));
+    ref.read(inventoryProvider.notifier).refresh();
   }
 }

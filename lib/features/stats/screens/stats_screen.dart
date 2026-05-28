@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../inventory/providers/inventory_provider.dart';
-import '../../inventory/screens/toy_detail_screen.dart';
+import '../../inventory/navigation/toy_detail_route.dart';
 import '../widgets/hero_count_card.dart';
 import '../widgets/needs_attention_card.dart';
 import '../widgets/recently_added_card.dart';
@@ -49,14 +49,7 @@ class StatsScreen extends ConsumerWidget {
   }
 
   void _navigateToDetail(BuildContext context, WidgetRef ref, int toyId) async {
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => ToyDetailScreen(toyId: toyId),
-      ),
-    );
-
-    if (result == true) {
-      ref.read(inventoryProvider.notifier).refresh();
-    }
+    await Navigator.of(context).push(toyDetailRoute(toyId));
+    ref.read(inventoryProvider.notifier).refresh();
   }
 }
