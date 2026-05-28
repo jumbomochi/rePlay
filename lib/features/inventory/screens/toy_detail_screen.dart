@@ -173,6 +173,11 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
       }
     }
 
+    final flightImagePath = (toy.thumbnailPath != null && toy.thumbnailPath!.isNotEmpty)
+        ? toy.thumbnailPath!
+        : imagePath;
+    final flightFile = File(flightImagePath);
+
     final file = imagePath.isEmpty ? null : File(imagePath);
     final fileExists = file != null && file.existsSync();
     final showHero = _selectedPhotoIndex == 0 && fileExists;
@@ -208,8 +213,7 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
               borderRadius: radius,
               child: AspectRatio(
                 aspectRatio: 1,
-                // ignore: unnecessary_non_null_assertion
-                child: Image.file(file!, fit: BoxFit.cover),
+                child: Image.file(flightFile, fit: BoxFit.cover),
               ),
             );
           },
@@ -602,7 +606,7 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
         await ref.read(inventoryProvider.notifier).deleteToy(widget.toyId);
 
     if (success && mounted) {
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop();
     }
   }
 
