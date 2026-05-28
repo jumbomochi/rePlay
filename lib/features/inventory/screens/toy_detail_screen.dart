@@ -173,14 +173,14 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
       }
     }
 
-    final showHero = _selectedPhotoIndex == 0 &&
-        imagePath.isNotEmpty &&
-        File(imagePath).existsSync();
+    final file = imagePath.isEmpty ? null : File(imagePath);
+    final fileExists = file != null && file.existsSync();
+    final showHero = _selectedPhotoIndex == 0 && fileExists;
 
     final image = AspectRatio(
       aspectRatio: 1,
-      child: imagePath.isNotEmpty && File(imagePath).existsSync()
-          ? Image.file(File(imagePath), fit: BoxFit.cover)
+      child: fileExists
+          ? Image.file(file, fit: BoxFit.cover)
           : Container(
               color: Colors.grey[200],
               child: Icon(Icons.toys, size: 80, color: Colors.grey[400]),
@@ -208,7 +208,8 @@ class _ToyDetailScreenState extends ConsumerState<ToyDetailScreen> {
               borderRadius: radius,
               child: AspectRatio(
                 aspectRatio: 1,
-                child: Image.file(File(imagePath), fit: BoxFit.cover),
+                // ignore: unnecessary_non_null_assertion
+                child: Image.file(file!, fit: BoxFit.cover),
               ),
             );
           },
