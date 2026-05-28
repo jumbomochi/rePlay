@@ -360,6 +360,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
 
   void _navigateToDetail(int toyId) async {
     await Navigator.of(context).push(toyDetailRoute(toyId));
+    if (!mounted) return;
     ref.read(inventoryProvider.notifier).refresh();
   }
 }

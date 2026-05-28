@@ -50,6 +50,7 @@ class StatsScreen extends ConsumerWidget {
 
   void _navigateToDetail(BuildContext context, WidgetRef ref, int toyId) async {
     await Navigator.of(context).push(toyDetailRoute(toyId));
+    if (!context.mounted) return;
     ref.read(inventoryProvider.notifier).refresh();
   }
 }
