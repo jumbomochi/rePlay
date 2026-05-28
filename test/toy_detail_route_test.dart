@@ -14,7 +14,7 @@ void main() {
     expect(builder.reverseTransitionDuration, const Duration(milliseconds: 300));
   });
 
-  testWidgets('toyDetailRoute pageBuilder produces ToyDetailScreen with correct toyId', (tester) async {
+  test('toyDetailRoute pageBuilder produces ToyDetailScreen with correct toyId', () {
     final route = toyDetailRoute(99) as PageRouteBuilder<void>;
     final page = route.pageBuilder(
       _DummyBuildContext(),
